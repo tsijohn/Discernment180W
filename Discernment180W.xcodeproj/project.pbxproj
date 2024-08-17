@@ -1,0 +1,584 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 55;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5261C0372C70F2930010F7CD /* Discernment180WApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5261C0362C70F2930010F7CD /* Discernment180WApp.swift */; };
+		5261C0392C70F2930010F7CD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5261C0382C70F2930010F7CD /* ContentView.swift */; };
+		5261C03B2C70F2940010F7CD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5261C03A2C70F2940010F7CD /* Assets.xcassets */; };
+		5261C03E2C70F2940010F7CD /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5261C03D2C70F2940010F7CD /* Preview Assets.xcassets */; };
+		5261C0482C70F2950010F7CD /* Discernment180WTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5261C0472C70F2950010F7CD /* Discernment180WTests.swift */; };
+		5261C0522C70F2950010F7CD /* Discernment180WUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5261C0512C70F2950010F7CD /* Discernment180WUITests.swift */; };
+		5261C0542C70F2950010F7CD /* Discernment180WUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5261C0532C70F2950010F7CD /* Discernment180WUITestsLaunchTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		5261C0442C70F2950010F7CD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5261C02B2C70F2930010F7CD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5261C0322C70F2930010F7CD;
+			remoteInfo = Discernment180W;
+		};
+		5261C04E2C70F2950010F7CD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5261C02B2C70F2930010F7CD /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5261C0322C70F2930010F7CD;
+			remoteInfo = Discernment180W;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		5261C0332C70F2930010F7CD /* Discernment180W.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Discernment180W.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5261C0362C70F2930010F7CD /* Discernment180WApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discernment180WApp.swift; sourceTree = "<group>"; };
+		5261C0382C70F2930010F7CD /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		5261C03A2C70F2940010F7CD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		5261C03D2C70F2940010F7CD /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		5261C0432C70F2950010F7CD /* Discernment180WTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Discernment180WTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5261C0472C70F2950010F7CD /* Discernment180WTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discernment180WTests.swift; sourceTree = "<group>"; };
+		5261C04D2C70F2950010F7CD /* Discernment180WUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Discernment180WUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5261C0512C70F2950010F7CD /* Discernment180WUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discernment180WUITests.swift; sourceTree = "<group>"; };
+		5261C0532C70F2950010F7CD /* Discernment180WUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Discernment180WUITestsLaunchTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5261C0302C70F2930010F7CD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5261C0402C70F2950010F7CD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5261C04A2C70F2950010F7CD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5261C02A2C70F2930010F7CD = {
+			isa = PBXGroup;
+			children = (
+				5261C0352C70F2930010F7CD /* Discernment180W */,
+				5261C0462C70F2950010F7CD /* Discernment180WTests */,
+				5261C0502C70F2950010F7CD /* Discernment180WUITests */,
+				5261C0342C70F2930010F7CD /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		5261C0342C70F2930010F7CD /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5261C0332C70F2930010F7CD /* Discernment180W.app */,
+				5261C0432C70F2950010F7CD /* Discernment180WTests.xctest */,
+				5261C04D2C70F2950010F7CD /* Discernment180WUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5261C0352C70F2930010F7CD /* Discernment180W */ = {
+			isa = PBXGroup;
+			children = (
+				5261C0362C70F2930010F7CD /* Discernment180WApp.swift */,
+				5261C0382C70F2930010F7CD /* ContentView.swift */,
+				5261C03A2C70F2940010F7CD /* Assets.xcassets */,
+				5261C03C2C70F2940010F7CD /* Preview Content */,
+			);
+			path = Discernment180W;
+			sourceTree = "<group>";
+		};
+		5261C03C2C70F2940010F7CD /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				5261C03D2C70F2940010F7CD /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		5261C0462C70F2950010F7CD /* Discernment180WTests */ = {
+			isa = PBXGroup;
+			children = (
+				5261C0472C70F2950010F7CD /* Discernment180WTests.swift */,
+			);
+			path = Discernment180WTests;
+			sourceTree = "<group>";
+		};
+		5261C0502C70F2950010F7CD /* Discernment180WUITests */ = {
+			isa = PBXGroup;
+			children = (
+				5261C0512C70F2950010F7CD /* Discernment180WUITests.swift */,
+				5261C0532C70F2950010F7CD /* Discernment180WUITestsLaunchTests.swift */,
+			);
+			path = Discernment180WUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5261C0322C70F2930010F7CD /* Discernment180W */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5261C0572C70F2950010F7CD /* Build configuration list for PBXNativeTarget "Discernment180W" */;
+			buildPhases = (
+				5261C02F2C70F2930010F7CD /* Sources */,
+				5261C0302C70F2930010F7CD /* Frameworks */,
+				5261C0312C70F2930010F7CD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Discernment180W;
+			productName = Discernment180W;
+			productReference = 5261C0332C70F2930010F7CD /* Discernment180W.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5261C0422C70F2950010F7CD /* Discernment180WTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5261C05A2C70F2950010F7CD /* Build configuration list for PBXNativeTarget "Discernment180WTests" */;
+			buildPhases = (
+				5261C03F2C70F2950010F7CD /* Sources */,
+				5261C0402C70F2950010F7CD /* Frameworks */,
+				5261C0412C70F2950010F7CD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5261C0452C70F2950010F7CD /* PBXTargetDependency */,
+			);
+			name = Discernment180WTests;
+			productName = Discernment180WTests;
+			productReference = 5261C0432C70F2950010F7CD /* Discernment180WTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		5261C04C2C70F2950010F7CD /* Discernment180WUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5261C05D2C70F2950010F7CD /* Build configuration list for PBXNativeTarget "Discernment180WUITests" */;
+			buildPhases = (
+				5261C0492C70F2950010F7CD /* Sources */,
+				5261C04A2C70F2950010F7CD /* Frameworks */,
+				5261C04B2C70F2950010F7CD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5261C04F2C70F2950010F7CD /* PBXTargetDependency */,
+			);
+			name = Discernment180WUITests;
+			productName = Discernment180WUITests;
+			productReference = 5261C04D2C70F2950010F7CD /* Discernment180WUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5261C02B2C70F2930010F7CD /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1320;
+				LastUpgradeCheck = 1320;
+				TargetAttributes = {
+					5261C0322C70F2930010F7CD = {
+						CreatedOnToolsVersion = 13.2.1;
+					};
+					5261C0422C70F2950010F7CD = {
+						CreatedOnToolsVersion = 13.2.1;
+						TestTargetID = 5261C0322C70F2930010F7CD;
+					};
+					5261C04C2C70F2950010F7CD = {
+						CreatedOnToolsVersion = 13.2.1;
+						TestTargetID = 5261C0322C70F2930010F7CD;
+					};
+				};
+			};
+			buildConfigurationList = 5261C02E2C70F2930010F7CD /* Build configuration list for PBXProject "Discernment180W" */;
+			compatibilityVersion = "Xcode 13.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 5261C02A2C70F2930010F7CD;
+			productRefGroup = 5261C0342C70F2930010F7CD /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5261C0322C70F2930010F7CD /* Discernment180W */,
+				5261C0422C70F2950010F7CD /* Discernment180WTests */,
+				5261C04C2C70F2950010F7CD /* Discernment180WUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5261C0312C70F2930010F7CD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5261C03E2C70F2940010F7CD /* Preview Assets.xcassets in Resources */,
+				5261C03B2C70F2940010F7CD /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5261C0412C70F2950010F7CD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5261C04B2C70F2950010F7CD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5261C02F2C70F2930010F7CD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5261C0392C70F2930010F7CD /* ContentView.swift in Sources */,
+				5261C0372C70F2930010F7CD /* Discernment180WApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5261C03F2C70F2950010F7CD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5261C0482C70F2950010F7CD /* Discernment180WTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5261C0492C70F2950010F7CD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5261C0522C70F2950010F7CD /* Discernment180WUITests.swift in Sources */,
+				5261C0542C70F2950010F7CD /* Discernment180WUITestsLaunchTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5261C0452C70F2950010F7CD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5261C0322C70F2930010F7CD /* Discernment180W */;
+			targetProxy = 5261C0442C70F2950010F7CD /* PBXContainerItemProxy */;
+		};
+		5261C04F2C70F2950010F7CD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5261C0322C70F2930010F7CD /* Discernment180W */;
+			targetProxy = 5261C04E2C70F2950010F7CD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		5261C0552C70F2950010F7CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		5261C0562C70F2950010F7CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		5261C0582C70F2950010F7CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Discernment180W/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Flannery.Discernment180W;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		5261C0592C70F2950010F7CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Discernment180W/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Flannery.Discernment180W;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		5261C05B2C70F2950010F7CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Flannery.Discernment180WTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Discernment180W.app/Discernment180W";
+			};
+			name = Debug;
+		};
+		5261C05C2C70F2950010F7CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Flannery.Discernment180WTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Discernment180W.app/Discernment180W";
+			};
+			name = Release;
+		};
+		5261C05E2C70F2950010F7CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Flannery.Discernment180WUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Discernment180W;
+			};
+			name = Debug;
+		};
+		5261C05F2C70F2950010F7CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = Flannery.Discernment180WUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Discernment180W;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5261C02E2C70F2930010F7CD /* Build configuration list for PBXProject "Discernment180W" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5261C0552C70F2950010F7CD /* Debug */,
+				5261C0562C70F2950010F7CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5261C0572C70F2950010F7CD /* Build configuration list for PBXNativeTarget "Discernment180W" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5261C0582C70F2950010F7CD /* Debug */,
+				5261C0592C70F2950010F7CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5261C05A2C70F2950010F7CD /* Build configuration list for PBXNativeTarget "Discernment180WTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5261C05B2C70F2950010F7CD /* Debug */,
+				5261C05C2C70F2950010F7CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5261C05D2C70F2950010F7CD /* Build configuration list for PBXNativeTarget "Discernment180WUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5261C05E2C70F2950010F7CD /* Debug */,
+				5261C05F2C70F2950010F7CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 5261C02B2C70F2930010F7CD /* Project object */;
+}
