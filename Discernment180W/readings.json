@@ -1,0 +1,17 @@
+{
+    "readings": [
+        {
+            "day": 0,
+            "content": "Welcome to Day 0! Here's your first reading."
+        },
+        {
+            "day": 1,
+            "content": "Day 1: Today's reading is about..."
+        },
+        {
+            "day": 2,
+            "content": "Day 2: Continue your journey with this reading."
+        }
+        
+    ]
+}
