@@ -1,14 +1,15 @@
 import SwiftUI
 
 struct SignUpPageView: View {
+    
+    @EnvironmentObject var authViewModel: AuthViewModel  // Inject AuthViewModel
+
     // State variables for the form fields
     @State private var firstName: String = ""
     @State private var lastName: String = ""
     @State private var email: String = ""
     @State private var age: String = ""
     @State private var diocese: String = ""
-    @State private var password: String = ""
-    
     @State private var showAlert = false
     @State private var alertMessage = ""
     @State private var navigateToHome = false
@@ -50,7 +51,6 @@ struct SignUpPageView: View {
                             CustomTextField(placeholder: "Email", text: $email)
                             CustomTextField(placeholder: "Age (Optional)", text: $age, keyboardType: .numberPad)
                             CustomTextField(placeholder: "Diocese (Optional)", text: $diocese)
-                            CustomTextField(placeholder: "Password", text: $password, isSecure: true)
                         }
                     }
 
@@ -84,6 +84,10 @@ struct SignUpPageView: View {
                 }
             )
         }
+        .navigationBarHidden(true)
+        .onAppear {
+            navigateToHome = false
+        }
     }
 
     private func handleSignUp() {
@@ -92,14 +96,13 @@ struct SignUpPageView: View {
             lastName: lastName,
             email: email,
             age: age.isEmpty ? nil : age,
-            diocese: diocese.isEmpty ? nil : diocese,
-            password: password
+            diocese: diocese.isEmpty ? nil : diocese
         ) { result in
             switch result {
             case .success:
-                alertMessage = "User signed up successfully!"
-                showAlert = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                DispatchQueue.main.async {
+                    let fullName = "\(firstName) \(lastName)"
+                    authViewModel.logIn(name: fullName, email: email, current_day: "0")  // Corrected call
                     navigateToHome = true
                 }
             case .failure(let error):
@@ -138,7 +141,7 @@ struct CustomTextField: View {
 // Preview
 struct SignUpPageView_Previews: PreviewProvider {
     static var previews: some View {
-        SignUpPageView()
+        SignUpPageView().environmentObject(AuthViewModel()) // Ensure environment object is included
     }
 }
 

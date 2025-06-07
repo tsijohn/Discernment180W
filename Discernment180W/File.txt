@@ -1,0 +1,30 @@
+if title == "Prayer" {
+        // Prayer Section (No changes)
+        HStack {
+            Text("Daily, Personal Prayer")
+                .font(.custom("Georgia", size: 16))
+                .foregroundColor(.black)
+                .padding(.leading, 16)
+            Spacer()
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(Color.black, lineWidth: 1)
+                    .frame(width: 120, height: 40)
+                    .padding(.trailing, 16)
+                
+                Picker("Select number of days", selection: $prayerDays) {
+                    ForEach(1..<8, id: \.self) { day in
+                        Text("\(day) day\(day > 1 ? "s" : "")")
+                            .tag("\(day)") // Ensure the tag is a String
+                    }
+                }
+                .pickerStyle(MenuPickerStyle())
+                .padding(.horizontal, 10)
+            }
+        }
+        .onAppear {
+            Task {
+                await fetchPrayerDays()
+            }
+        }
+    }

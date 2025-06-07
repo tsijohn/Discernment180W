@@ -14,26 +14,17 @@ struct VideoPlayerView: View {
                 .ignoresSafeArea()
 
             VStack {
+                // Added title text
+                Text("Intro to D180")
+                    .font(.largeTitle)
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+                    .padding(.top, 40)
+
                 AVPlayerView(url: videoURL, isPlaying: $isVideoPlaying)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
 
                 VStack(spacing: 20) {
-                    Button(action: {
-                        isVideoPlaying = false // Stop video when navigating
-                        showPreviewPage = true
-                    }) {
-                        Text("Still not sure")
-                            .font(.headline)
-                            .fontWeight(.bold)
-                            .padding()
-                            .frame(maxWidth: .infinity)
-                            .background(Color.gray)
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
-                            .padding(.horizontal, 20)
-                    }
-                    .frame(height: 50)
-
                     Button(action: {
                         isVideoPlaying = false // Stop video when navigating
                         showSignUpPage = true
@@ -44,6 +35,22 @@ struct VideoPlayerView: View {
                             .padding()
                             .frame(maxWidth: .infinity)
                             .background(Color(red: 216 / 255, green: 158 / 255, blue: 99 / 255))
+                            .foregroundColor(.white)
+                            .cornerRadius(8)
+                            .padding(.horizontal, 20)
+                    }
+                    .frame(height: 50)
+
+                    Button(action: {
+                        isVideoPlaying = false // Stop video when navigating
+                        showPreviewPage = true
+                    }) {
+                        Text("Preview Day 0")
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(Color.gray)
                             .foregroundColor(.white)
                             .cornerRadius(8)
                             .padding(.horizontal, 20)

@@ -19,7 +19,7 @@ class SupabaseManager {
         let supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5d25xYndscm52aG9naGl6ZnBuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3OTA4MzUsImV4cCI6MjA1MjM2NjgzNX0.4RgHActLZUkRnTvsSxkwu_VMxfZOWQhH8Q_nio2RjJ0" // Make sure this is your actual key
         client = SupabaseClient(supabaseURL: supabaseURL, supabaseKey: supabaseKey)
     }
-    func signUpUser(firstName: String, lastName: String, email: String, age: String?, diocese: String?, password: String, completion: @escaping (Result<Void, Error>) -> Void) {
+    func signUpUser(firstName: String, lastName: String, email: String, age: String?, diocese: String?, completion: @escaping (Result<Void, Error>) -> Void) {
             Task {
                 do {
                     // Create a user object
@@ -32,7 +32,7 @@ class SupabaseManager {
                         .execute()
 
                     // Sign up user with Supabase Authentication
-                    _ = try await client.auth.signUp(email: email, password: password)
+                    _ = try await client.auth.signUp(email: email, password: "123123")
 
                     DispatchQueue.main.async {
                         completion(.success(()))

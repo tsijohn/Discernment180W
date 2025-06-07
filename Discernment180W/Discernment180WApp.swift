@@ -2,9 +2,8 @@ import SwiftUI
 
 @main
 struct Discernment180WApp: App {
+    @StateObject var authViewModel = AuthViewModel() // Manage authentication state
     @StateObject private var appState = AppState() // Initialize AppState
-    @StateObject private var authViewModel = AuthViewModel() // Manage authentication state
-
     let persistenceController = PersistenceController.shared
 
     init() {

@@ -1,8 +1,11 @@
 import SwiftUI
 
 struct UserProfileView: View {
-    @State private var isEditing: Bool = false // Toggle for edit mode
-    
+    @EnvironmentObject var authViewModel: AuthViewModel // Use the AuthViewModel
+    @State private var isEditing: Bool = false
+    @State private var editedName: String = ""
+    @State private var editedEmail: String = ""
+
     var body: some View {
         VStack {
             // Profile Image
@@ -10,7 +13,6 @@ struct UserProfileView: View {
                 .font(.system(size: 100))
                 .padding()
                 .onTapGesture {
-                    // Action for changing profile image
                     print("Change profile picture")
                 }
                 .accessibilityLabel("Profile Image")
@@ -21,10 +23,10 @@ struct UserProfileView: View {
                     Text("Name:")
                         .font(.headline)
                     if isEditing {
-                        TextField("Name", text: .constant("Greg Gerhart"))
+                        TextField("Name", text: $editedName)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                     } else {
-                        Text("Greg Gerhart")
+                        Text(authViewModel.userName)
                             .font(.body)
                     }
                 }
@@ -33,10 +35,10 @@ struct UserProfileView: View {
                     Text("Email:")
                         .font(.headline)
                     if isEditing {
-                        TextField("Email", text: .constant("fr.greg.gerhart@austindiocese.org"))
+                        TextField("Email", text: $editedEmail)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                     } else {
-                        Text("fr.greg.gerhart@austindiocese.org")
+                        Text(authViewModel.userEmail)
                             .font(.body)
                     }
                 }
@@ -54,6 +56,15 @@ struct UserProfileView: View {
             // Edit Button
             Button(action: {
                 withAnimation {
+                    if isEditing {
+                        authViewModel.userName = editedName
+                        authViewModel.userEmail = editedEmail
+                        UserDefaults.standard.set(editedName, forKey: "userName")
+                        UserDefaults.standard.set(editedEmail, forKey: "userEmail")
+                    } else {
+                        editedName = authViewModel.userName
+                        editedEmail = authViewModel.userEmail
+                    }
                     isEditing.toggle()
                 }
             }) {
@@ -69,11 +80,10 @@ struct UserProfileView: View {
         }
         .navigationTitle("Profile")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            editedName = authViewModel.userName
+            editedEmail = authViewModel.userEmail
+        }
     }
 }
 
-struct UserProfileView_Previews: PreviewProvider {
-    static var previews: some View {
-        UserProfileView()
-    }
-}

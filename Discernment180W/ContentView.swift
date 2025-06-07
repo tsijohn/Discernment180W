@@ -41,17 +41,7 @@ struct ContentView: View {
                         .shadow(color: .black.opacity(0.3), radius: 3, x: 0, y: 1) // Reduced shadow intensity
                         .multilineTextAlignment(.center) // Center the logo and title
                     
-                    // Daily Reading Button
-                    NavigationLink(destination: DailyReadingView()) {
-                        Text("Daily Reading")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color(red: 19/255, green: 42/255, blue: 71/255)) // Updated to #132A47
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                            .padding(.horizontal, 40)
-                    }
+
 
                     // Daily Checklist Button
                     NavigationLink(destination: DailyChecklistView()) {

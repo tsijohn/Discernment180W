@@ -12,21 +12,33 @@ struct SplashScreenView: View {
                 .ignoresSafeArea()
             
             VStack {
+
                 Spacer()
-                VStack(spacing: 30) { // Spacing between text elements
+
+                VStack(spacing: 5) { // Spacing between text elements
+                    Image("d180_app_icon") // Make sure "app_icon" exists in Assets.xcassets
+                        .renderingMode(.template)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 240, height: 240) // Adjust size as needed
+                        .padding(.bottom, 5)
+                        .padding(.top, -110) 
+                        .foregroundColor(.white) // Apply white tint
+
+                    
                     Text("ARE YOU CALLED?")
-                        .font(.system(size: 20, weight: .medium))
+                        .font(.custom("Palatino", size: 20))
                         .foregroundColor(.white)
                     
-                    Text("DISCERNMENT 180")
-                        .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.white)
-                    
+
                     Text("A Six-Month Guide for Catholic Men to Discern the Priesthood")
-                        .font(.system(size: 20, weight: .regular))
+
+                        .font(.custom("Palatino", size: 20))
                         .multilineTextAlignment(.center)
                         .foregroundColor(.white)
+
                         .padding(.horizontal, 40)
+                        .padding(.top, 15)
                 }
                 Spacer()
             }
@@ -40,9 +52,8 @@ struct SplashScreenView: View {
             if authViewModel.isLoggedIn {
                 HomePageView()
             } else {
-                VideoPlayerView()
+                HomePageView()
             }
         }
     }
 }
-

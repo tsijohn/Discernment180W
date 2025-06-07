@@ -21,17 +21,7 @@ struct LetterView: View {
                     .multilineTextAlignment(.leading) // Align text to the leading edge
                 }
                 
-                // Navigation Button
-                NavigationLink(destination: DailyReadingView(), isActive: $navigateToDailyReading) {
-                    Text("Next")
-                        .frame(maxWidth: .infinity)
-                        .padding()
-                        .background(Color.blue)
-                        .foregroundColor(.white)
-                        .cornerRadius(10)
-                        .padding(.horizontal)
-                }
-                .padding(.top, 0) // Add some space above the button
+
             }
             .navigationTitle("Letter from Bishop Vazquez") // Title for the letter page
             .navigationBarTitleDisplayMode(.inline)

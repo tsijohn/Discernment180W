@@ -1,14 +1,10 @@
-//
-//  WeekPreviewView.swift
-//  Discernment180W
-//
-//  Created by John Kim on 1/8/25.
-//
-
 import SwiftUI
 
 struct WeekPreviewView: View {
     @Environment(\.presentationMode) var presentationMode // For navigating back
+    @State private var studyText: String = "Loading..."
+    @State private var previewText: String = "Loading..."
+    @State private var isCompleted: Bool = false // Tracks completion state
 
     var body: some View {
         ZStack {
@@ -16,17 +12,35 @@ struct WeekPreviewView: View {
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: 15) {
-                HStack {
-                    Spacer()
-
-                    // Header with title
+                // Title and Completion Toggle
+                VStack {
                     Text("Week 2 Preview")
                         .font(.custom("Georgia", size: 20))
                         .fontWeight(.bold)
                         .foregroundColor(.black)
                         .padding(.top, 10)
 
-                    Spacer()
+                    // Toggle Slider for Completion
+                    HStack {
+                        Text("Mark as Completed")
+                            .font(.custom("Georgia", size: 16))
+                            .foregroundColor(.black)
+
+                        Spacer()
+
+                        Toggle("", isOn: $isCompleted)
+                            .toggleStyle(SwitchToggleStyle(tint: .blue)) // iOS-style switch
+                            .onChange(of: isCompleted) { newValue in
+                                print("Week preview marked as \(newValue ? "completed" : "not completed")")
+                                Task {
+                                    await updateCompletionStatus(isCompleted: newValue)
+                                }
+                            }
+                    }
+                    .padding()
+                    .background(Color.white.opacity(0.9))
+                    .cornerRadius(10)
+                    .padding(.horizontal)
                 }
 
                 ScrollView {
@@ -37,13 +51,13 @@ struct WeekPreviewView: View {
                                 .font(.custom("Georgia", size: 18))
                                 .fontWeight(.bold)
                                 .foregroundColor(.black)
-                                .padding(.leading, 16) // Added left padding
+                                .padding(.leading, 16)
 
-                            Text(loremIpsumText())
+                            Text(previewText)
                                 .font(.custom("Georgia", size: 16))
                                 .foregroundColor(.black)
                                 .lineSpacing(5)
-                                .padding(.horizontal)
+                                .padding()
                                 .background(Color.white.opacity(0.9))
                                 .cornerRadius(10)
                         }
@@ -54,33 +68,78 @@ struct WeekPreviewView: View {
                                 .font(.custom("Georgia", size: 18))
                                 .fontWeight(.bold)
                                 .foregroundColor(.black)
-                                .padding(.leading, 16) // Added left padding
+                                .padding(.leading, 16)
 
-                            Text(loremIpsumText())
+                            Text(studyText)
                                 .font(.custom("Georgia", size: 16))
                                 .foregroundColor(.black)
                                 .lineSpacing(5)
-                                .padding(.horizontal)
+                                .padding()
                                 .background(Color.white.opacity(0.9))
                                 .cornerRadius(10)
                         }
                     }
                     .padding(.bottom, 20)
                 }
-
-                Spacer()
             }
         }
         .navigationTitle("")
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await fetchWeekPreview()
+        }
     }
 
-    // Sample lorem ipsum text
-    func loremIpsumText() -> String {
-        return """
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-        """
+    // Fetches study and preview text from Supabase
+    func fetchWeekPreview() async {
+        do {
+            print("Fetching data from Supabase...") // Debugging Start
+
+            let result: [[String: String]] = try await SupabaseManager.shared.client
+                .from("d180menspreview")
+                .select("study, prayer, Complete")
+                .eq("day", value: "8") // Ensure correct filtering
+                .execute()
+                .value // Directly access the value without JSON decoding
+
+            print("Raw result from Supabase:", result) // Print full result
+            
+            if let firstResult = result.first {
+                print("First result:", firstResult) // Print first record
+                
+                studyText = firstResult["study"] ?? "No study content available."
+                previewText = firstResult["prayer"] ?? "No preview content available."
+                isCompleted = (firstResult["Complete"] == "Yes") // Convert "Yes"/"No" to Boolean
+            } else {
+                print("No matching records found.")
+                studyText = "No study content available."
+                previewText = "No preview content available."
+            }
+        } catch {
+            print("Error fetching week preview:", error) // Print error details
+            studyText = "Failed to load study content."
+            previewText = "Failed to load preview content."
+        }
     }
+
+    // Updates completion status in Supabase
+    func updateCompletionStatus(isCompleted: Bool) async {
+            let completionStatus = isCompleted ? "Yes" : "No"
+
+            do {
+                print("Updating completion status to \(completionStatus)...")
+                
+                let _ = try await SupabaseManager.shared.client
+                    .from("d180menspreview")
+                    .update(["Complete": completionStatus]) // Pass the dictionary directly, no 'values:' label
+                    .eq("day", value: "8") // Match the correct user_id
+                    .execute()
+                
+
+            } catch {
+                print("Error updating completion status:", error)
+            }
+        }
 }
 
 struct WeekPreviewView_Previews: PreviewProvider {

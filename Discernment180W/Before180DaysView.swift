@@ -81,9 +81,7 @@ struct Before180DaysView: View {
         .fullScreenCover(isPresented: $showSignUpPage) {
             SignUpPageView() // Navigate to SignUpPageView
         }
-        .fullScreenCover(isPresented: $showDailyReadingPage) {
-            DailyReadingView() // Navigate to DailyReadingView
-        }
+
     }
 }
 
