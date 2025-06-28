@@ -8,6 +8,7 @@ struct Prayer: Identifiable {
 
 struct PrayersView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.presentationMode) var presentationMode
     
     private let accentColor = Color.blue
     private let backgroundColor = Color(.systemBackground)
@@ -25,7 +26,7 @@ struct PrayersView: View {
         Prayer(
             title: "Entrust Your Vocation to Mary",
             text: """
-            Blessed Mother, I entrust myself and my vocation to your  motherly care and intercession. You perfectly heard the word of  God and obeyed. Pray for me, that I too might also hear God’s  word and follow where He leads. Should the Lord desire me to  be a priest, ask your Son that I might receive the grace to hear  His call and the strength of faith and hope to lay down my life  in loving service for the Church. O Mother of the Word Incar nate, be my mother, too. May God be glorified to answer your  prayers on my behalf. Amen. 
+            Blessed Mother, I entrust myself and my vocation to your  motherly care and intercession. You perfectly heard the word of  God and obeyed. Pray for me, that I too might also hear God's  word and follow where He leads. Should the Lord desire me to  be a priest, ask your Son that I might receive the grace to hear  His call and the strength of faith and hope to lay down my life  in loving service for the Church. O Mother of the Word Incar nate, be my mother, too. May God be glorified to answer your  prayers on my behalf. Amen. 
 
             """
         ),
@@ -56,52 +57,124 @@ struct PrayersView: View {
     @State private var favoritePrayers: Set<UUID> = []
     
     var body: some View {
-        ZStack {
-            backgroundColor.edgesIgnoringSafeArea(.all)
-            
-            ScrollView {
-                VStack(spacing: 16) {
-                    ForEach(prayers) { prayer in
-                        PrayerCard(
-                            prayer: prayer,
-                            isFavorite: favoritePrayers.contains(prayer.id),
-                            toggleFavorite: {
-                                if favoritePrayers.contains(prayer.id) {
-                                    favoritePrayers.remove(prayer.id)
-                                } else {
-                                    favoritePrayers.insert(prayer.id)
-                                }
-                            },
-                            accentColor: accentColor
-                        )
+        VStack(spacing: 0) {
+            // Fixed header with back button and home button
+            HStack {
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 18, weight: .medium))
+                        Text("Back")
+                            .font(.system(size: 17, weight: .medium))
                     }
-                }
-                .padding(.horizontal)
-                .padding(.bottom, 16)
-            }
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .principal) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "book.pages.fill")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 24)
-                        Text("Prayers")
-                            .font(.headline)
-                            .foregroundColor(.primary)
-                    }
+                    .foregroundColor(.blue)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(.systemBackground))
+                            .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1)
+                    )
                 }
                 
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.title3)
-                            .foregroundColor(.secondary)
+                Spacer()
+                
+                // Home button
+                Button(action: {
+                    // Multiple approaches to ensure we get to root
+                    
+                    // First dismiss all modal presentations
+                    presentationMode.wrappedValue.dismiss()
+                    
+                    // Then try multiple methods to get to root
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        // Method 1: Try UIKit navigation
+                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                           let window = windowScene.windows.first {
+                            
+                            var currentVC = window.rootViewController
+                            
+                            // Navigate through the hierarchy to find navigation controller
+                            while currentVC != nil {
+                                if let navController = currentVC as? UINavigationController {
+                                    navController.popToRootViewController(animated: true)
+                                    return
+                                } else if let tabController = currentVC as? UITabBarController {
+                                    if let selectedNav = tabController.selectedViewController as? UINavigationController {
+                                        selectedNav.popToRootViewController(animated: true)
+                                        return
+                                    }
+                                } else if let presented = currentVC?.presentedViewController {
+                                    currentVC = presented
+                                } else if let children = currentVC?.children, !children.isEmpty {
+                                    currentVC = children.first
+                                } else {
+                                    break
+                                }
+                            }
+                        }
+                        
+                        // Method 2: Dismiss all and try again
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                               let window = windowScene.windows.first,
+                               let rootNav = window.rootViewController as? UINavigationController {
+                                rootNav.popToRootViewController(animated: true)
+                            }
+                        }
                     }
+                }) {
+                    HStack(spacing: 6) {
+                        Text("Home")
+                            .font(.system(size: 17, weight: .medium))
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 18, weight: .medium))
+                    }
+                    .foregroundColor(.blue)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(.systemBackground))
+                            .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1)
+                    )
                 }
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(Color(.systemGroupedBackground))
+            
+            // Scrollable content
+            ZStack {
+                backgroundColor.edgesIgnoringSafeArea(.all)
+                
+                ScrollView {
+                    VStack(spacing: 14) {
+                        ForEach(prayers) { prayer in
+                            PrayerCard(
+                                prayer: prayer,
+                                isFavorite: favoritePrayers.contains(prayer.id),
+                                toggleFavorite: {
+                                    if favoritePrayers.contains(prayer.id) {
+                                        favoritePrayers.remove(prayer.id)
+                                    } else {
+                                        favoritePrayers.insert(prayer.id)
+                                    }
+                                },
+                                accentColor: accentColor
+                            )
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
+                    .padding(.top, 8)
+                }
+            }
+            .background(Color(.systemGroupedBackground))
         }
+        .navigationBarHidden(true)
     }
 }
 
@@ -112,7 +185,7 @@ struct PrayerCard: View {
     let accentColor: Color
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 14) {
             Text(prayer.title)
                 .font(.title3)
                 .fontWeight(.bold)
@@ -123,21 +196,19 @@ struct PrayerCard: View {
             
             Text(prayer.text)
                 .font(.body)
-                .lineSpacing(6)
+                .lineSpacing(5)
                 .foregroundColor(.primary)
                 .fixedSize(horizontal: false, vertical: true)
-            
-
         }
-        .padding(20)
+        .padding(16)
         .background(
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 14)
                 .fill(Color(.secondarySystemBackground))
-                .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+                .shadow(color: Color.black.opacity(0.05), radius: 4, x: 0, y: 1)
         )
         .overlay(
             isFavorite ?
-            RoundedRectangle(cornerRadius: 16)
+            RoundedRectangle(cornerRadius: 14)
                 .stroke(accentColor, lineWidth: 2)
             : nil
         )

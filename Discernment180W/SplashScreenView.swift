@@ -25,18 +25,11 @@ struct SplashScreenView: View {
                         .padding(.top, -110) 
                         .foregroundColor(.white) // Apply white tint
 
-                    
-                    Text("ARE YOU CALLED?")
-                        .font(.custom("Palatino", size: 20))
-                        .foregroundColor(.white)
-                    
 
                     Text("A Six-Month Guide for Catholic Men to Discern the Priesthood")
-
-                        .font(.custom("Palatino", size: 20))
+                        .font(.system(size: 25, weight: .bold))
                         .multilineTextAlignment(.center)
                         .foregroundColor(.white)
-
                         .padding(.horizontal, 40)
                         .padding(.top, 15)
                 }

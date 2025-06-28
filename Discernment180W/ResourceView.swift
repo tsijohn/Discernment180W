@@ -5,10 +5,17 @@ struct ResourceView: View {
     
     let featuredResources = [
         Resource(
+            title: "Discernment 180",
+            author: "Fr. Greg Gerhart",
+            description: "A comprehensive 180-day discernment guide for men considering the priesthood. This book provides daily reflections, prayers, and practical advice for a thorough discernment journey.",
+            url: "https://vianneyvocations.com/product/d180/",
+            category: .book
+        ),
+        Resource(
             title: "To Save a Thousand Souls",
             author: "Fr. Brett Brannen",
             description: "The definitive guide for men considering the priesthood. This comprehensive book explains in down-to-earth language how to carefully discover God's call to diocesan priesthood.",
-            url: "https://www.amazon.com/Save-Thousand-Souls-Discerning-Priesthood/dp/0615345514",
+            url: "https://vianneyvocations.com/product/to-save-a-thousand-souls/",
             category: .book
         ),
         Resource(
@@ -25,7 +32,7 @@ struct ResourceView: View {
             title: "Virginity",
             author: "Raniero Cantalamessa",
             description: "A guide to celibacy for the sake of the Kingdom as it truly is: a gift to be received, not a burden to be imposed.",
-            url: "https://www.amazon.com/Virginity-Positive-Approach-Celibacy-Kingdom/dp/0818907452",
+            url: "https://www.amazon.com/Virginity-Positive-Approach-Celibacy-Kingdom/dp/0818914009",
             category: .book
         ),
         Resource(
@@ -62,12 +69,100 @@ struct ResourceView: View {
     ]
     
     var body: some View {
-        ZStack(alignment: .topLeading) {
-            // Main content
+        VStack(spacing: 0) {
+            // Fixed header with back button and home button
+            HStack {
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 18, weight: .medium))
+                        Text("Back")
+                            .font(.system(size: 17, weight: .medium))
+                    }
+                    .foregroundColor(.blue)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(.systemBackground))
+                            .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1)
+                    )
+                }
+                
+                Spacer()
+                
+                // Home button
+                Button(action: {
+                    // Multiple approaches to ensure we get to root
+                    
+                    // First dismiss all modal presentations
+                    presentationMode.wrappedValue.dismiss()
+                    
+                    // Then try multiple methods to get to root
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        // Method 1: Try UIKit navigation
+                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                           let window = windowScene.windows.first {
+                            
+                            var currentVC = window.rootViewController
+                            
+                            // Navigate through the hierarchy to find navigation controller
+                            while currentVC != nil {
+                                if let navController = currentVC as? UINavigationController {
+                                    navController.popToRootViewController(animated: true)
+                                    return
+                                } else if let tabController = currentVC as? UITabBarController {
+                                    if let selectedNav = tabController.selectedViewController as? UINavigationController {
+                                        selectedNav.popToRootViewController(animated: true)
+                                        return
+                                    }
+                                } else if let presented = currentVC?.presentedViewController {
+                                    currentVC = presented
+                                } else if let children = currentVC?.children, !children.isEmpty {
+                                    currentVC = children.first
+                                } else {
+                                    break
+                                }
+                            }
+                        }
+                        
+                        // Method 2: Dismiss all and try again
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                               let window = windowScene.windows.first,
+                               let rootNav = window.rootViewController as? UINavigationController {
+                                rootNav.popToRootViewController(animated: true)
+                            }
+                        }
+                    }
+                }) {
+                    HStack(spacing: 6) {
+                        Text("Home")
+                            .font(.system(size: 17, weight: .medium))
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 18, weight: .medium))
+                    }
+                    .foregroundColor(.blue)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(.systemBackground))
+                            .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1)
+                    )
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(Color(.systemGroupedBackground))
+            
+            // Scrollable content
             ScrollView {
                 LazyVStack(spacing: 0, pinnedViews: .sectionHeaders) {
                     // Content Sections
-                    LazyVStack(spacing: 32) {
+                    LazyVStack(spacing: 24) {
                         // Essential Resources
                         ResourceSection(
                             title: "Essential Resources",
@@ -92,41 +187,11 @@ struct ResourceView: View {
                             accentColor: Color(red: 0.8, green: 0.4, blue: 0.2)
                         )
                     }
-                    .padding(.top, 80) // Space for back button
-                    .padding(.bottom, 40)
+                    .padding(.top, 8)
+                    .padding(.bottom, 24)
                 }
             }
             .background(Color(.systemGroupedBackground))
-            
-            // Custom back button
-            VStack {
-                HStack {
-                    Button(action: {
-                        presentationMode.wrappedValue.dismiss()
-                    }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "chevron.left")
-                                .font(.system(size: 18, weight: .medium))
-                            Text("Back")
-                                .font(.system(size: 17, weight: .medium))
-                        }
-                        .foregroundColor(.blue)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(
-                            RoundedRectangle(cornerRadius: 20)
-                                .fill(Color(.systemBackground))
-                                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
-                        )
-                    }
-                    
-                    Spacer()
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 10)
-                
-                Spacer()
-            }
         }
         .navigationBarHidden(true)
     }
@@ -139,7 +204,7 @@ struct ResourceSection: View {
     let accentColor: Color
     
     var body: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             // Section Header
             VStack(alignment: .leading, spacing: 4) {
                 HStack {
@@ -156,13 +221,13 @@ struct ResourceSection: View {
                     Spacer()
                 }
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 16)
             
             // Resources
-            LazyVStack(spacing: 12) {
+            LazyVStack(spacing: 10) {
                 ForEach(resources, id: \.title) { resource in
                     ModernResourceCard(resource: resource, accentColor: accentColor)
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 16)
                 }
             }
         }
@@ -180,20 +245,20 @@ struct ModernResourceCard: View {
                 UIApplication.shared.open(url)
             }
         }) {
-            HStack(spacing: 16) {
+            HStack(spacing: 14) {
                 // Icon
                 ZStack {
                     Circle()
                         .fill(accentColor.opacity(0.1))
-                        .frame(width: 50, height: 50)
+                        .frame(width: 44, height: 44)
                     
                     Image(systemName: resource.category.iconName)
-                        .font(.system(size: 20, weight: .medium))
+                        .font(.system(size: 18, weight: .medium))
                         .foregroundColor(accentColor)
                 }
                 
                 // Content
-                VStack(alignment: .leading, spacing: 6) {
+                VStack(alignment: .leading, spacing: 5) {
                     HStack {
                         Text(resource.title)
                             .font(.headline)
@@ -223,19 +288,19 @@ struct ModernResourceCard: View {
                 
                 Spacer(minLength: 0)
             }
-            .padding(20)
+            .padding(16)
             .background(
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: 14)
                     .fill(Color(.systemBackground))
                     .shadow(
                         color: Color.black.opacity(0.05),
-                        radius: isPressed ? 2 : 8,
+                        radius: isPressed ? 2 : 6,
                         x: 0,
-                        y: isPressed ? 1 : 4
+                        y: isPressed ? 1 : 3
                     )
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 16)
+                RoundedRectangle(cornerRadius: 14)
                     .stroke(
                         LinearGradient(
                             gradient: Gradient(colors: [

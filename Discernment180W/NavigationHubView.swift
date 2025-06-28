@@ -2,6 +2,8 @@ import SwiftUI
 import Supabase
 
 struct NavigationHubView: View {
+    @Environment(\.presentationMode) var presentationMode
+    
     // Group days into weeks for organization
     let weeks = Array(stride(from: 1, to: 181, by: 7)).map { weekStart in
         Array(weekStart...(min(weekStart + 6, 180)))
@@ -11,6 +13,7 @@ struct NavigationHubView: View {
     @State private var currentDay: Int = 1
     @State private var isLoading: Bool = true
     @State private var completedDays: [Int] = []
+    @State private var dayToCurriculumOrder: [Int: Int] = [:] // NEW: Map day to curriculum_order
     
     // Calculate current week from current day
     private var currentWeek: Int {
@@ -31,174 +34,257 @@ struct NavigationHubView: View {
         VStack {
             Circle()
                 .fill(Color(hexString: "#19223b"))
-                .frame(width: 60, height: 60)
+                .frame(width: 56, height: 56)
                 .overlay(
                     Text("W\(week)")
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.system(size: 15, weight: .bold))
                         .foregroundColor(.white)
                 )
             Text("Week \(week)")
-                .font(.caption)
+                .font(.caption2)
                 .foregroundColor(Color(hexString: "#19223b"))
         }
     }
     
     var body: some View {
-        ScrollView {
-            if isLoading {
-                VStack {
-                    ProgressView()
-                        .scaleEffect(1.5)
-                    Text("Loading your progress...")
-                        .padding(.top, 16)
-                        .foregroundColor(.secondary)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(.top, 100)
-            } else {
-                VStack(alignment: .leading, spacing: 20) {
-                    // Enhanced Current Day Indicator with Progress Bar
-                    VStack(spacing: 16) {
-                        // Current Day Header
-                        HStack {
-                            Text("Currently on: ")
-                                .font(.headline)
-                            Text("Day \(currentDay)")
-                                .font(.headline)
-                                .foregroundColor(Color(hexString: "#19223b"))
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .fill(Color(hexString: "#19223b").opacity(0.2))
-                                )
-                            
-                            Spacer()
-                            
-                            NavigationLink(destination: DailyReadingView(day: String(currentDay))) {
-                                Text("Continue")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 8)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .fill(Color(hexString: "#19223b"))
-                                    )
-                            }
-                        }
-                        
-                        // Progress Bar Section
-                        NavigationProgressIndicator(currentDay: currentDay, currentWeek: currentWeek)
+        VStack(spacing: 0) {
+            // Fixed header with back button and home button
+            HStack {
+                Button(action: {
+                    presentationMode.wrappedValue.dismiss()
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 18, weight: .medium))
+                        Text("Back")
+                            .font(.system(size: 17, weight: .medium))
                     }
-                    .padding(.horizontal)
-                    .padding(.vertical, 16)
+                    .foregroundColor(.blue)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
                     .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(.secondarySystemBackground))
-                            .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(.systemBackground))
+                            .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1)
                     )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color(hexString: "#19223b").opacity(0.3), lineWidth: 1)
-                    )
-                    .padding(.horizontal)
+                }
+                
+                Spacer()
+                
+                // Home button
+                Button(action: {
+                    // Dismiss current view and pop to root
+                    presentationMode.wrappedValue.dismiss()
                     
-                    // Quick jump section
-                    VStack(alignment: .leading) {
-                        Text("Weekly Reviews")
-                            .font(.headline)
-                            .padding(.horizontal)
-                        
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 15) {
-                                ForEach(1..<26) { week in
-                                    let destination = WeekReviewView(weekNumber: week)
-                                    NavigationLink(destination: destination) {
-                                        weekCircleButton(for: week)
+                    // Use a slight delay to ensure smooth navigation
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        // Find the navigation controller and pop to root
+                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                           let window = windowScene.windows.first {
+                            
+                            // Try to find and pop navigation stack
+                            func findNavigationController(in viewController: UIViewController?) -> UINavigationController? {
+                                if let navController = viewController as? UINavigationController {
+                                    return navController
+                                }
+                                for child in viewController?.children ?? [] {
+                                    if let found = findNavigationController(in: child) {
+                                        return found
                                     }
                                 }
+                                return nil
                             }
-                            .padding(.horizontal)
+                            
+                            if let navController = findNavigationController(in: window.rootViewController) {
+                                navController.popToRootViewController(animated: true)
+                            }
                         }
                     }
-                    .padding(.vertical)
-                    
-                    Divider()
-                    
-                    // Excursus section
-                    VStack(alignment: .leading) {
-                        Text("Excursus Readings")
-                            .font(.headline)
-                            .padding(.horizontal)
-                        
-                        NavigationLink(destination: ExcursusView()) {
+                }) {
+                    HStack(spacing: 6) {
+                        Text("Home")
+                            .font(.system(size: 17, weight: .medium))
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 18, weight: .medium))
+                    }
+                    .foregroundColor(.blue)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(.systemBackground))
+                            .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1)
+                    )
+                }
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(Color(.systemGroupedBackground))
+            
+            // Scrollable content
+            ScrollView {
+                if isLoading {
+                    VStack {
+                        ProgressView()
+                            .scaleEffect(1.5)
+                        Text("Loading your progress...")
+                            .padding(.top, 16)
+                            .foregroundColor(.secondary)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(.top, 60)
+                } else {
+                    VStack(alignment: .leading, spacing: 16) {
+                        // Enhanced Current Day Indicator with Progress Bar
+                        VStack(spacing: 12) {
+                            // Current Day Header
                             HStack {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text("Additional Spiritual Readings")
-                                        .font(.subheadline)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(Color(hexString: "#19223b"))
-                                    
-                                    Text("Explore supplementary materials and deeper spiritual insights")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
-                                        .multilineTextAlignment(.leading)
-                                }
+                                Text("Currently on: ")
+                                    .font(.headline)
+                                Text("Day \(currentDay)")
+                                    .font(.headline)
+                                    .foregroundColor(Color(hexString: "#19223b"))
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 5)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 6)
+                                            .fill(Color(hexString: "#19223b").opacity(0.2))
+                                    )
                                 
                                 Spacer()
                                 
-                                Image(systemName: "book.closed")
-                                    .font(.system(size: 20))
-                                    .foregroundColor(Color(hexString: "#19223b"))
-                                
-                                Image(systemName: "chevron.right")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(.secondary)
+                                // FIXED: Use curriculum_order for current day navigation
+                                if let curriculumOrder = dayToCurriculumOrder[currentDay] {
+                                    NavigationLink(destination: DailyReadingView(day: String(curriculumOrder))) {
+                                        Text("Continue")
+                                            .font(.subheadline)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 14)
+                                            .padding(.vertical, 7)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 7)
+                                                    .fill(Color(hexString: "#19223b"))
+                                            )
+                                    }
+                                }
                             }
-                            .padding()
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color(hexString: "#19223b").opacity(0.08))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .stroke(Color(hexString: "#19223b").opacity(0.2), lineWidth: 1)
-                                    )
-                            )
+                            
+                            // Progress Bar Section
+                            NavigationProgressIndicator(currentDay: currentDay, currentWeek: currentWeek)
                         }
-                        .padding(.horizontal)
-                    }
-                    .padding(.vertical)
-                    
-                    Divider()
-                    
-                    // Days section
-                    Text("Daily Readings")
-                        .font(.headline)
-                        .padding(.horizontal)
-                    
-                    // Week for current day should be first
-                    if let currentWeek = weekForDay(currentDay) {
-                        weekSection(weekIndex: currentWeek - 1, isCurrentWeek: true)
-                    }
-                    
-                    // Other weeks
-                    ForEach(weeks.indices, id: \.self) { index in
-                        let weekNumber = index + 1
-                        // Skip the current week as it's already shown
-                        if weekNumber != weekForDay(currentDay) {
-                            weekSection(weekIndex: index, isCurrentWeek: false)
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 14)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color(.secondarySystemBackground))
+                                .shadow(color: Color.black.opacity(0.06), radius: 3, x: 0, y: 1)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(Color(hexString: "#19223b").opacity(0.25), lineWidth: 1)
+                        )
+                        .padding(.horizontal, 16)
+                        
+                        // Quick jump section
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Weekly Reviews")
+                                .font(.headline)
+                                .padding(.horizontal, 16)
+                            
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 12) {
+                                    ForEach(1..<26) { week in
+                                        let destination = WeekReviewView(weekNumber: week)
+                                        NavigationLink(destination: destination) {
+                                            weekCircleButton(for: week)
+                                        }
+                                    }
+                                }
+                                .padding(.horizontal, 16)
+                            }
+                        }
+                        .padding(.vertical, 8)
+                        
+                        Divider()
+                            .padding(.horizontal, 16)
+                        
+                        // Excursus section
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Excursus Readings")
+                                .font(.headline)
+                                .padding(.horizontal, 16)
+                            
+                            NavigationLink(destination: ExcursusView()) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 6) {
+                                        Text("Additional Spiritual Readings")
+                                            .font(.subheadline)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(Color(hexString: "#19223b"))
+                                        
+                                        Text("Explore supplementary materials and deeper spiritual insights")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                            .multilineTextAlignment(.leading)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Image(systemName: "book.closed")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(Color(hexString: "#19223b"))
+                                    
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(.secondary)
+                                }
+                                .padding(14)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(Color(hexString: "#19223b").opacity(0.08))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .stroke(Color(hexString: "#19223b").opacity(0.2), lineWidth: 1)
+                                        )
+                                )
+                            }
+                            .padding(.horizontal, 16)
+                        }
+                        .padding(.vertical, 8)
+                        
+                        Divider()
+                            .padding(.horizontal, 16)
+                        
+                        // Days section
+                        Text("Daily Readings")
+                            .font(.headline)
+                            .padding(.horizontal, 16)
+                        
+                        // Week for current day should be first
+                        if let currentWeek = weekForDay(currentDay) {
+                            weekSection(weekIndex: currentWeek - 1, isCurrentWeek: true)
+                        }
+                        
+                        // Other weeks
+                        ForEach(weeks.indices, id: \.self) { index in
+                            let weekNumber = index + 1
+                            // Skip the current week as it's already shown
+                            if weekNumber != weekForDay(currentDay) {
+                                weekSection(weekIndex: index, isCurrentWeek: false)
+                            }
                         }
                     }
+                    .padding(.vertical, 8)
+                    .padding(.top, 8)
                 }
-                .padding(.vertical)
             }
+            .background(Color(.systemGroupedBackground))
         }
-        .navigationTitle("Navigate")
-        .navigationBarTitleDisplayMode(.inline)
+        .navigationBarHidden(true)
         .onAppear {
             Task {
+                await fetchDayToCurriculumMapping()
                 await fetchCurrentDay()
                 isLoading = false
             }
@@ -210,7 +296,7 @@ struct NavigationHubView: View {
         let weekNumber = weekIndex + 1
         let weekDays = weeks[weekIndex]
         
-        return VStack(alignment: .leading) {
+        return VStack(alignment: .leading, spacing: 8) {
             Button(action: {
                 withAnimation {
                     if expandedWeek == weekNumber {
@@ -228,12 +314,12 @@ struct NavigationHubView: View {
                     
                     if isCurrentWeek {
                         Text("Current")
-                            .font(.caption)
+                            .font(.caption2)
                             .foregroundColor(.white)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 3)
                             .background(
-                                RoundedRectangle(cornerRadius: 4)
+                                RoundedRectangle(cornerRadius: 3)
                                     .fill(Color(hexString: "#19223b"))
                             )
                     }
@@ -242,12 +328,13 @@ struct NavigationHubView: View {
                     
                     Image(systemName: expandedWeek == weekNumber ? "chevron.up" : "chevron.down")
                         .foregroundColor(Color(hexString: "#19223b"))
+                        .font(.system(size: 12))
                 }
-                .padding(.vertical, 8)
-                .padding(.horizontal)
+                .padding(.vertical, 7)
+                .padding(.horizontal, 12)
                 .background(
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(isCurrentWeek ? Color(hexString: "#19223b").opacity(0.15) : Color.gray.opacity(0.1))
+                    RoundedRectangle(cornerRadius: 7)
+                        .fill(isCurrentWeek ? Color(hexString: "#19223b").opacity(0.15) : Color.gray.opacity(0.08))
                 )
             }
             .onAppear {
@@ -262,17 +349,25 @@ struct NavigationHubView: View {
             }
             
             if expandedWeek == weekNumber {
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 15) {
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                     ForEach(weekDays, id: \.self) { day in
-                        NavigationLink(destination: DailyReadingView(day: String(day))) {
-                            dayButton(day: day)
+                        // FIXED: Use curriculum_order for navigation
+                        if let curriculumOrder = dayToCurriculumOrder[day] {
+                            NavigationLink(destination: DailyReadingView(day: String(curriculumOrder))) {
+                                dayButton(day: day)
+                            }
+                        } else {
+                            // Fallback if mapping not found
+                            NavigationLink(destination: DailyReadingView(day: String(day))) {
+                                dayButton(day: day)
+                            }
                         }
                     }
                 }
-                .padding(.top, 10)
+                .padding(.top, 8)
             }
         }
-        .padding(.horizontal)
+        .padding(.horizontal, 16)
     }
     
     // Helper function to create consistent day buttons
@@ -282,25 +377,53 @@ struct NavigationHubView: View {
         
         return VStack {
             ZStack {
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: 7)
                     .fill(isCurrentDay
                           ? Color(hexString: "#19223b")
                           : Color(hexString: "#19223b").opacity(0.1))
-                    .frame(height: 50)
+                    .frame(height: 44)
                 
                 HStack {
                     if isDayCompleted {
                         // Show checkmark for completed days
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundColor(isCurrentDay ? .white : Color.green)
-                            .font(.system(size: 14))
+                            .font(.system(size: 12))
                     }
                     
                     Text("Day \(day)")
-                        .font(.system(size: 16, weight: .medium))
+                        .font(.system(size: 15, weight: .medium))
                         .foregroundColor(isCurrentDay ? .white : Color(hexString: "#19223b"))
                 }
             }
+        }
+    }
+    
+    // NEW: Fetch mapping between day and curriculum_order
+    func fetchDayToCurriculumMapping() async {
+        do {
+            struct DayMapping: Decodable {
+                let day: Int
+                let curriculum_order: Int
+            }
+            
+            let mappings: [DayMapping] = try await SupabaseManager.shared.client
+                .from("d180mens")
+                .select("day, curriculum_order")
+                .gte("day", value: 1) // Only get regular days (not weekly reviews or excursus)
+                .lte("day", value: 180)
+                .execute()
+                .value
+            
+            DispatchQueue.main.async {
+                // Create the mapping dictionary
+                for mapping in mappings {
+                    self.dayToCurriculumOrder[mapping.day] = mapping.curriculum_order
+                }
+                print("Day to curriculum_order mapping loaded: \(self.dayToCurriculumOrder.count) entries")
+            }
+        } catch {
+            print("Error fetching day to curriculum_order mapping: \(error)")
         }
     }
     
@@ -363,7 +486,7 @@ struct NavigationProgressIndicator: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 10) {
             // Progress stats
             HStack {
                 Text("Week \(currentWeek) of 26")
@@ -380,10 +503,10 @@ struct NavigationProgressIndicator: View {
             }
             
             // Progress bar
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 5) {
                 ProgressView(value: progressPercentage)
                     .progressViewStyle(LinearProgressViewStyle(tint: Color(hexString: "#19223b")))
-                    .scaleEffect(x: 1, y: 2, anchor: .center)
+                    .scaleEffect(x: 1, y: 1.8, anchor: .center)
                 
                 // Milestone markers (optional)
                 HStack {
