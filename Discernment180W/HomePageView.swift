@@ -10,159 +10,160 @@ struct HomePageView: View {
     @State private var dailyReadingSubtitle: String = ""
     @State private var isWeeklyReview: Bool = false
     @State private var hasJustUpdatedCurriculum: Bool = false
-    @State private var isNavigatingToWeeklyReview: Bool = false // NEW: Flag to prevent onChange during navigation
+    @State private var isNavigatingToWeeklyReview: Bool = false
+    @State private var completedDays: [Int]? = nil
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var authViewModel: AuthViewModel
 
-    // Computed property for greeting
-
-
-    // Computed property for today's date
+    // Computed property for today's date - SMALLER FONT
     var todayDate: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE, MMMM d yyyy"
+        formatter.dateFormat = "EEEE, MMMM d"
         return formatter.string(from: Date())
     }
-
-    // Countdown to Jan 31
-
-
     
-    // Logo view component
+    // Logo view component with subtle glow effect
     var logoView: some View {
-        Image("D180Logo")
-            .resizable()
-            .renderingMode(.template)
-            .foregroundColor(.white)
-            .scaledToFit()
+        ZStack {
+            // Subtle glow behind logo
+            Image("D180Logo")
+                .resizable()
+                .renderingMode(.template)
+                .foregroundColor(Color(hexString: "#DAA520").opacity(0.3))
+                .scaledToFit()
+                .blur(radius: 20)
+            
+            Image("D180Logo")
+                .resizable()
+                .renderingMode(.template)
+                .foregroundColor(.white)
+                .scaledToFit()
+                .shadow(color: .black.opacity(0.3), radius: 4, x: 0, y: 2)
+        }
     }
     
-    // Gold gradient for buttons
+    // Enhanced gold gradient
     var goldGradient: LinearGradient {
         LinearGradient(
             gradient: Gradient(colors: [
+                Color(hexString: "#FFD700"),
                 Color(hexString: "#DAA520"),
-                Color(hexString: "#CD853F"),
-                Color(hexString: "#DAA520")
+                Color(hexString: "#B8860B")
             ]),
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
     }
     
-    // Common button style
-    func navButtonStyle(icon: String, label: String, iconColor: Color = Color(hexString: "#19223b")) -> some View {
-        RoundedRectangle(cornerRadius: 15)
-            .stroke(goldGradient, lineWidth: 2.5)
-            .frame(width: 67.5, height: 67.5)
-            .overlay(
-                VStack(spacing: 4) {
-                    Image(systemName: icon)
-                        .font(.system(size: 28.5))
-                        .foregroundColor(iconColor)
-                    Text(label)
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundColor(iconColor)
-                }
-            )
-            .background(
-                RoundedRectangle(cornerRadius: 15)
-                    .fill(Color(hexString: "#E5E5E5"))
-                    .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
-            )
+    // Enhanced dark blue gradient
+    var darkBlueGradient: LinearGradient {
+        LinearGradient(
+            gradient: Gradient(colors: [
+                Color(hexString: "#1A3556"),
+                Color(hexString: "#132A47"),
+                Color(hexString: "#0F2339")
+            ]),
+            startPoint: .top,
+            endPoint: .bottom
+        )
     }
     
-    // Navigation buttons
+    // Enhanced button style with better shadows and filled icons
+    func navButtonStyle(icon: String, label: String, iconColor: Color = Color(hexString: "#132A47")) -> some View {
+        ZStack {
+            // White background with better shadow
+            RoundedRectangle(cornerRadius: 15)
+                .fill(Color.white)
+                .frame(width: 70, height: 70)
+                .shadow(color: Color.black.opacity(0.15), radius: 6, x: 0, y: 3)
+            
+            // Gold border
+            RoundedRectangle(cornerRadius: 15)
+                .stroke(goldGradient, lineWidth: 2.5)
+                .frame(width: 70, height: 70)
+            
+            VStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.system(size: 28, weight: .medium))
+                    .foregroundColor(iconColor)
+                Text(label)
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundColor(iconColor)
+            }
+        }
+    }
+    
+    // Navigation buttons with filled icons
     var ruleButton: some View {
-        NavigationLink(destination: WeekReviewView(weekNumber: getCurrentWeekNumber(from: appState.currentDayText))) {
-            navButtonStyle(icon: "list.bullet.clipboard", label: "Rule", iconColor: Color(hexString: "#132A47"))
+        NavigationLink(destination: WeekReviewView(weekNumber: getCurrentWeekNumber(from: appState.currentDayText), showSkipButton: false)
+            .environmentObject(authViewModel)) {
+            navButtonStyle(icon: "list.bullet.clipboard.fill", label: "Rule")
         }
     }
     
     var prayersButton: some View {
         NavigationLink(destination: PrayersView()) {
-            navButtonStyle(icon: "hands.sparkles", label: "Prayers")
+            navButtonStyle(icon: "hands.sparkles.fill", label: "Prayers")
         }
     }
     
     var navigateButton: some View {
         NavigationLink(destination: NavigationHubView()) {
-            navButtonStyle(icon: "map", label: "Navigate")
+            navButtonStyle(icon: "map.fill", label: "Navigate")
         }
     }
     
     var resourcesButton: some View {
         NavigationLink(destination: ResourceView()) {
-            navButtonStyle(icon: "book.closed", label: "Resources")
+            navButtonStyle(icon: "book.closed.fill", label: "Resources")
         }
     }
     
-    // Daily reading title view
-    var dailyReadingTitleView: some View {
-        VStack(spacing: 12) {
-            Text("Day \(appState.currentDayText)")
-                .font(.custom("Georgia", size: 32))
-                .fontWeight(.bold)
-                .foregroundColor(.white)
+    // Enhanced play button with gold accent
+    var playButton: some View {
+        ZStack {
+            Circle()
+                .fill(Color.white)
+                .frame(width: 70, height: 70)
+                .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 4)
             
-            Text(dailyReadingTitle)
-                .font(.custom("Georgia", size: 24))
-                .fontWeight(.medium)
-                .foregroundColor(.white)
-                .multilineTextAlignment(.center)
-                .lineLimit(2)
-                .truncationMode(.tail)
-                .frame(maxWidth: 280)
-                .fixedSize(horizontal: false, vertical: true)
+            Circle()
+                .stroke(goldGradient, lineWidth: 2)
+                .frame(width: 70, height: 70)
             
-            // Subtitle with 20 character limit
-            if !dailyReadingSubtitle.isEmpty {
-                Text(dailyReadingSubtitle.count > 20 ?
-                     String(dailyReadingSubtitle.prefix(20)) + "..." :
-                     dailyReadingSubtitle)
-                    .font(.custom("Georgia", size: 16))
-                    .foregroundColor(.white.opacity(0.8))
-                    .multilineTextAlignment(.center)
-                    .lineLimit(1)
-                    .frame(maxWidth: 280)
-            }
-            
-            Image(systemName: "arrow.right.circle.fill")
-                .font(.system(size: 48))
-                .foregroundColor(.white.opacity(0.8))
-                .padding(.top, 4)
+            Image(systemName: "play.fill")
+                .font(.system(size: 28))
+                .foregroundColor(Color(hexString: "#132A47"))
+                .offset(x: 2)
         }
     }
     
-    // Simplified weekly review button content
+    // Weekly review button content with play button
     @ViewBuilder
     var weeklyReviewButtonContent: some View {
         VStack(spacing: 20) {
             logoView
                 .frame(height: 100)
-            Image(systemName: "arrow.right.circle.fill")
-                .font(.system(size: 60))
-                .foregroundColor(.white.opacity(0.9))
+            playButton
         }
     }
     
-    // Simplified daily reading button content
+    // Daily reading button content with play button
     @ViewBuilder
     var dailyReadingButtonContent: some View {
         VStack(spacing: 20) {
             logoView
                 .frame(height: 100)
-            Image(systemName: "arrow.right.circle.fill")
-                .font(.system(size: 60))
-                .foregroundColor(.white.opacity(0.9))
+            playButton
         }
     }
     
-    // Fixed navigation link for weekly review
+    // Hidden navigation link for weekly review
     @ViewBuilder
     var hiddenWeeklyReviewNavigationLink: some View {
         NavigationLink(
-            destination: WeekReviewView(weekNumber: weekNumberForNavigation),
+            destination: WeekReviewView(weekNumber: weekNumberForNavigation, showSkipButton: true)
+                .environmentObject(authViewModel),
             isActive: $shouldNavigateToWeekReview
         ) {
             EmptyView()
@@ -170,27 +171,41 @@ struct HomePageView: View {
         .hidden()
     }
     
-    // Updated content section with fixed navigation
+    // Helper function to check if Day 0 should be shown
+    private func shouldShowDay0() -> Bool {
+        return appState.curriculumOrder == "0"
+    }
+    
+    // Content section with navigation
     @ViewBuilder
     var contentSection: some View {
-        if appState.curriculumOrder == "-1" {
-            // Weekly review for curriculum order -1
+        // Check for Day 0 conditions (curriculum_order == "0")
+        if shouldShowDay0() {
+            NavigationLink(
+                destination: Day0View()
+                    .environmentObject(authViewModel)
+                    .environmentObject(appState)
+            ) {
+                dailyReadingButtonContent
+            }
+            .buttonStyle(PlainButtonStyle())
+        } else if appState.curriculumOrder == "-1" {
             Button(action: handleWeeklyReviewTap) {
                 weeklyReviewButtonContent
             }
             .buttonStyle(PlainButtonStyle())
             .background(hiddenWeeklyReviewNavigationLink)
         } else if isWeeklyReview {
-            // Weekly review for other cases
             Button(action: handleWeeklyReviewTap) {
                 weeklyReviewButtonContent
             }
             .buttonStyle(PlainButtonStyle())
             .background(hiddenWeeklyReviewNavigationLink)
         } else {
-            // Daily reading - pass the curriculum_order directly with useCurrentDay flag
             NavigationLink(
-                destination: DailyReadingView(day: appState.curriculumOrder, useCurrentDay: true)
+                destination: DailyReadingView(day: appState.curriculumOrder, useCurrentDay: true, showSkipButton: true)
+                    .environmentObject(authViewModel)
+                    .environmentObject(appState)  // Pass appState to DailyReadingView
             ) {
                 dailyReadingButtonContent
             }
@@ -198,32 +213,54 @@ struct HomePageView: View {
         }
     }
     
-    // FIXED: Action handler for weekly review tap
+    // Action handler for weekly review tap
     func handleWeeklyReviewTap() {
         Task {
-            // Set navigation flag to prevent onChange from interfering
             await MainActor.run {
                 isNavigatingToWeeklyReview = true
             }
             
-            // Increment the curriculum order in the database
-            await incrementCurriculumOrderInDatabase(email: "Utjohnkkim@gmail.com")
+            await incrementCurriculumOrderInDatabase(email: authViewModel.userEmail)
             
-            // Navigate to weekly review on the main thread
             await MainActor.run {
                 shouldNavigateToWeekReview = true
             }
             
-            // Reset the navigation flag after a delay to allow navigation to complete
-            try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second delay
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
             await MainActor.run {
                 isNavigatingToWeeklyReview = false
             }
         }
     }
     
+    // Function to fetch completed days
+    private func fetchCompletedDays() async {
+        do {
+            let response = try await SupabaseManager.shared.client
+                .from("users")
+                .select("completed_days")
+                .eq("email", value: authViewModel.userEmail)
+                .execute()
+            
+            if let dataArray = try? JSONSerialization.jsonObject(with: response.data) as? [[String: Any]],
+               let userData = dataArray.first {
+                await MainActor.run {
+                    self.completedDays = userData["completed_days"] as? [Int]
+                }
+            }
+        } catch {
+            print("Error fetching completed days: \(error)")
+        }
+    }
+    
     // Function to fetch content based on curriculum_order
     func fetchContentFromCurriculumOrder() async {
+        // Check if we should show Day 0 first
+        if shouldShowDay0() {
+            // Don't fetch or set any titles for Day 0
+            return
+        }
+        
         do {
             struct D180MensResponse: Decodable {
                 let title: String
@@ -245,26 +282,20 @@ struct HomePageView: View {
             if let firstEntry = decoded.first {
                 await MainActor.run {
                     if firstEntry.day == -1 {
-                        // This is a weekly review
                         self.isWeeklyReview = true
                         self.weeklyReviewTitle = firstEntry.title
                         self.weeklyReviewDayText = firstEntry.day_text
                         if let weekNum = Int(firstEntry.day_text) {
                             self.weekNumberForNavigation = weekNum
                         }
-                        // Clear daily reading fields
                         self.dailyReadingTitle = ""
                         self.dailyReadingSubtitle = ""
-                        // For weekly reviews, we might want to keep the previous day number
                     } else {
-                        // This is a daily reading - use the day number, not day_text
                         self.isWeeklyReview = false
                         self.dailyReadingTitle = firstEntry.title
                         self.dailyReadingSubtitle = firstEntry.subtitle ?? ""
-                        // Update day display with the actual day number
                         self.currentDayText = String(firstEntry.day)
                         appState.currentDayText = String(firstEntry.day)
-                        // Clear weekly review fields
                         self.weeklyReviewTitle = ""
                         self.weeklyReviewDayText = ""
                     }
@@ -280,187 +311,295 @@ struct HomePageView: View {
 
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                // Blue header section
-                VStack(spacing: 0) {
-                    HStack(alignment: .top) {
-                        VStack(alignment: .leading) {
-                            Text(todayDate)
-                                .font(.system(size: 21.16, weight: .bold))  // Increased from 18.4 to 21.16 (15% bigger)
-                                .foregroundColor(.white.opacity(0.9))
-                        }
-                        .padding(.leading, 20)
-                        .padding(.top, 70)
-
-                        Spacer()
-
-                        NavigationLink(destination: UserProfileView()) {
-                            Image(systemName: "person.circle.fill")
-                                .font(.system(size: 40))
-                                .foregroundColor(.white)
-                                .padding(.trailing, 20)
-                                .padding(.top, 70)
-                        }
+            if !authViewModel.isAuthenticated {
+                Text("Please log in")
+                    .font(.custom("Georgia", size: 18))
+                    .onAppear {
+                        authViewModel.logout()
                     }
-                    
-                    Spacer()
-                    
-                    // Center section with logo and arrow button
-                    contentSection
-                        .frame(maxHeight: .infinity)
-                        .onAppear {
-                            let email = authViewModel.userEmail
-                            Task {
-                                print("HomePageView onAppear - hasJustUpdatedCurriculum: \(hasJustUpdatedCurriculum)")
-                                
-                                if !hasJustUpdatedCurriculum {
-                                    print("Fetching current day from database")
-                                    await appState.fetchCurrentDay(for: email)
-                                } else {
-                                    print("Skipping fetch, using updated curriculum_order: \(appState.curriculumOrder)")
-                                    hasJustUpdatedCurriculum = false
+            } else {
+                VStack(spacing: 0) {
+                    // Enhanced Blue header section with gradient
+                    ZStack {
+                        // Gradient background
+                        darkBlueGradient
+                        
+                        // Subtle texture overlay
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.08),
+                                Color.clear,
+                                Color.black.opacity(0.1)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        
+                        VStack(spacing: 0) {
+                            HStack(alignment: .top) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    // Smaller date font
+                                    Text(todayDate)
+                                        .font(.system(size: 20, weight: .semibold))
+                                        .foregroundColor(.white.opacity(0.9))
+
                                 }
-                                
-                                print("Current curriculum_order: \(appState.curriculumOrder)")
-                                
-                                // Use the unified function instead of separate ones
-                                await fetchContentFromCurriculumOrder()
-                            }
-                        }
-                        .onChange(of: appState.curriculumOrder) { newValue in
-                            // FIXED: Only update content if we're not navigating to weekly review
-                            if !isNavigatingToWeeklyReview {
-                                Task {
-                                    await fetchContentFromCurriculumOrder()
+                                .padding(.leading, 20)
+                                .padding(.top, 70)
+
+                                Spacer()
+
+                                NavigationLink(destination: UserProfileView()
+                                    .environmentObject(authViewModel)) {
+                                    ZStack {
+                                        Circle()
+                                            .stroke(goldGradient.opacity(0.6), lineWidth: 2)
+                                            .frame(width: 42, height: 42)
+                                        
+                                        Image(systemName: "person.circle.fill")
+                                            .font(.system(size: 40))
+                                            .foregroundColor(.white)
+                                    }
+                                    .padding(.trailing, 20)
+                                    .padding(.top, 70)
                                 }
-                            } else {
-                                print("Skipping fetchContentFromCurriculumOrder due to navigation in progress")
                             }
-                        }
-                        .onChange(of: shouldNavigateToWeekReview) { isNavigating in
-                            if !isNavigating {
-                                // When navigation ends, reset the flag after a small delay
-                                Task {
-                                    try? await Task.sleep(nanoseconds: 500_000_000) // 0.5 second delay
-                                    await MainActor.run {
-                                        if !shouldNavigateToWeekReview { // Double check
-                                            isNavigatingToWeeklyReview = false
+                            
+                            Spacer()
+                            
+                            // Center section with logo and play button
+                            contentSection
+                                .frame(maxHeight: .infinity)
+                                .onAppear {
+                                    let email = authViewModel.userEmail
+                                    Task {
+                                        print("📱 HomePageView contentSection onAppear")
+                                        print("   - email: \(email)")
+                                        print("   - curriculumOrder: '\(appState.curriculumOrder)'")
+                                        print("   - hasJustUpdatedCurriculum: \(hasJustUpdatedCurriculum)")
+                                        
+                                        // Only fetch from database if curriculumOrder is empty or if we need to reset from weekly review
+                                        if appState.curriculumOrder.isEmpty {
+                                            print("   📊 curriculumOrder is empty, fetching from database...")
+                                            await appState.fetchCurrentDay(for: email)
+                                            await fetchCompletedDays()
+                                            await fetchContentFromCurriculumOrder()
+                                        } else if hasJustUpdatedCurriculum {
+                                            print("   ✅ Just updated curriculum, using local state")
+                                            hasJustUpdatedCurriculum = false
+                                            await fetchContentFromCurriculumOrder()
+                                        } else {
+                                            print("   ✅ Using existing curriculumOrder: \(appState.curriculumOrder)")
+                                            await fetchContentFromCurriculumOrder()
+                                            await fetchCompletedDays()
+                                        }
+                                        
+                                        print("   Final curriculum_order: \(appState.curriculumOrder)")
+                                    }
+                                }
+                                .onChange(of: appState.curriculumOrder) { newValue in
+                                    print("📱 curriculumOrder changed to: \(newValue)")
+                                    if !isNavigatingToWeeklyReview {
+                                        Task {
+                                            await fetchContentFromCurriculumOrder()
+                                            await fetchCompletedDays()
+                                        }
+                                    } else {
+                                        print("   Skipping fetch due to navigation in progress")
+                                    }
+                                }
+                                .onChange(of: shouldNavigateToWeekReview) { isNavigating in
+                                    if !isNavigating {
+                                        Task {
+                                            try? await Task.sleep(nanoseconds: 500_000_000)
+                                            await MainActor.run {
+                                                if !shouldNavigateToWeekReview {
+                                                    isNavigatingToWeeklyReview = false
+                                                }
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        }
-                    
-                    Spacer()
-                    
-                    // Bottom section with title and subtitle aligned left
-                    VStack(alignment: .leading, spacing: 8) {
-                        if appState.curriculumOrder == "-1" || isWeeklyReview {
-                            Text("WEEK \(weekNumberForNavigation)")
-                                .font(.system(size: 15.18, weight: .medium))  // Increased from 13.2 to 15.18 (15% bigger)
-                                .foregroundColor(.white.opacity(0.7))
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 4)
-                                        .fill(Color.white.opacity(0.15))
-                                )
                             
-                            Text(weeklyReviewTitle)
-                                .font(.system(size: 23.1, weight: .bold))  // Increased from 21 to 23.1 (10% bigger)
-                                .foregroundColor(.white)
-                                .multilineTextAlignment(.leading)
-                                .lineLimit(2)
-                                .truncationMode(.tail)
-                        } else {
-                            // Only show the DAY badge if the day number is positive
-                            if let dayNumber = Int(appState.currentDayText), dayNumber > 0 {
-                                Text("DAY \(appState.currentDayText)")
-                                    .font(.system(size: 15.18, weight: .medium))  // Increased from 13.2 to 15.18 (15% bigger)
-                                    .foregroundColor(.white.opacity(0.7))
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 4)
-                                            .fill(Color.white.opacity(0.15))
-                                    )
-                            }
+                            Spacer()
                             
-                            Text(dailyReadingTitle)
-                                .font(.system(size: 23.1, weight: .bold))  // Increased from 21 to 23.1 (10% bigger)
-                                .foregroundColor(.white)
-                                .multilineTextAlignment(.leading)
-                                .lineLimit(2)
-                                .truncationMode(.tail)
-                            
-                            if !dailyReadingSubtitle.isEmpty {
-                                Text(dailyReadingSubtitle.count > 115 ?
-                                     String(dailyReadingSubtitle.prefix(115)) + "..." :
-                                     dailyReadingSubtitle)
-                                    .font(.system(size: 12, weight: .medium))  // Kept at 12
-                                    .foregroundColor(.white.opacity(0.8))
-                                    .multilineTextAlignment(.leading)
-                                    .lineLimit(2)
+                            // Enhanced bottom section with gold accents
+                            VStack(alignment: .leading, spacing: 8) {
+                                if shouldShowDay0() {
+                                    Text("DAY 0")
+                                        .font(.system(size: 14, weight: .bold))
+                                        .foregroundColor(Color(hexString: "#DAA520"))
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 5)
+                                        .background(
+                                            Capsule()
+                                                .fill(Color.white.opacity(0.15))
+                                                .overlay(
+                                                    Capsule()
+                                                        .stroke(Color(hexString: "#DAA520").opacity(0.5), lineWidth: 1)
+                                                )
+                                        )
+                                    
+                                    Text("Welcome to Discernment 180")
+                                        .font(.system(size: 24, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .multilineTextAlignment(.leading)
+                                        .lineLimit(2)
+                                        .truncationMode(.tail)
+                                        .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
+                                    
+                                    Text("Begin your journey of discernment")
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundColor(.white.opacity(0.85))
+                                        .multilineTextAlignment(.leading)
+                                        .lineLimit(2)
+                                } else if appState.curriculumOrder == "-1" || isWeeklyReview {
+                                    Text("WEEK \(weekNumberForNavigation)")
+                                        .font(.system(size: 14, weight: .bold))
+                                        .foregroundColor(Color(hexString: "#DAA520"))
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 5)
+                                        .background(
+                                            Capsule()
+                                                .fill(Color.white.opacity(0.15))
+                                                .overlay(
+                                                    Capsule()
+                                                        .stroke(Color(hexString: "#DAA520").opacity(0.5), lineWidth: 1)
+                                                )
+                                        )
+                                    
+                                    Text(weeklyReviewTitle)
+                                        .font(.system(size: 24, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .multilineTextAlignment(.leading)
+                                        .lineLimit(2)
+                                        .truncationMode(.tail)
+                                        .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
+                                } else {
+                                    if let dayNumber = Int(appState.currentDayText), dayNumber > 0 {
+                                        Text("DAY \(appState.currentDayText)")
+                                            .font(.system(size: 14, weight: .bold))
+                                            .foregroundColor(Color(hexString: "#DAA520"))
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 5)
+                                            .background(
+                                                Capsule()
+                                                    .fill(Color.white.opacity(0.15))
+                                                    .overlay(
+                                                        Capsule()
+                                                            .stroke(Color(hexString: "#DAA520").opacity(0.5), lineWidth: 1)
+                                                    )
+                                            )
+                                    }
+                                    
+                                    Text(dailyReadingTitle)
+                                        .font(.system(size: 24, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .multilineTextAlignment(.leading)
+                                        .lineLimit(2)
+                                        .truncationMode(.tail)
+                                        .shadow(color: .black.opacity(0.2), radius: 2, x: 0, y: 1)
+                                    
+                                    if !dailyReadingSubtitle.isEmpty {
+                                        Text(dailyReadingSubtitle.count > 115 ?
+                                             String(dailyReadingSubtitle.prefix(115)) + "..." :
+                                             dailyReadingSubtitle)
+                                            .font(.system(size: 13, weight: .medium))
+                                            .foregroundColor(.white.opacity(0.85))
+                                            .multilineTextAlignment(.leading)
+                                            .lineLimit(2)
+                                    }
+                                }
                             }
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 30)
-                }
-                .frame(height: UIScreen.main.bounds.height * 0.60)
-                .background(Color(hexString: "#132A47"))
-                
-                // Gray section
-                ScrollView {
-                    VStack(spacing: 0) {
-                        VStack(spacing: 20) {
-                            HStack(spacing: 20) {
-                                ruleButton
-                                prayersButton
-                                navigateButton
-                                resourcesButton
-                            }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 20)
-                            .padding(.vertical, 30)
-                            
-                            // Bible quote
-                            VStack(spacing: 8) {
-                                Text("Romans 12:2")
-                                    .font(.custom("Georgia", size: 20.8))  // Increased from 16 to 20.8 (30% bigger)
-                                    .fontWeight(.bold)
-                                    .foregroundColor(Color(hexString: "#132A47"))
-                                
-                                Text("\"Be transformed by the renewal of your mind, so you may discern what is good, pleasing, and perfect: the will of God.\"")
-                                    .font(.custom("Georgia", size: 20.8))  // Increased from 16 to 20.8 (30% bigger)
-                                    .fontWeight(.regular)
-                                    .foregroundColor(Color(hexString: "#132A47"))
-                                    .multilineTextAlignment(.center)
-                                    .padding(.horizontal, 30)
-                            }
-                            .padding(.bottom, 20)
+                            .padding(.bottom, 30)
                         }
+                    }
+                    .frame(height: UIScreen.main.bounds.height * 0.60)
+                    
+                    // Enhanced gray section with better background
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            VStack(spacing: 20) {
+                                // Four navigation buttons in a row
+                                HStack(spacing: 18) {
+                                    ruleButton
+                                    prayersButton
+                                    navigateButton
+                                    resourcesButton
+                                }
+                                .padding(.horizontal, 20)
+                                .padding(.vertical, 30)
+                                
+                                // Enhanced Bible quote card
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .fill(Color.white)
+                                        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 3)
+                                    
+                                    RoundedRectangle(cornerRadius: 15)
+                                        .stroke(goldGradient.opacity(0.3), lineWidth: 1)
+                                    
+                                    VStack(spacing: 10) {
+                                        Text("Romans 12:2")
+                                            .font(.custom("Georgia", size: 20))
+                                            .fontWeight(.bold)
+                                            .foregroundColor(Color(hexString: "#132A47"))
+                                        
+                                        Text("\"Be transformed by the renewal of your mind, so you may discern what is good, pleasing, and perfect: the will of God.\"")
+                                            .font(.custom("Georgia", size: 18))
+                                            .fontWeight(.regular)
+                                            .foregroundColor(Color(hexString: "#132A47").opacity(0.9))
+                                            .multilineTextAlignment(.center)
+                                            .padding(.horizontal, 20)
+                                    }
+                                    .padding(.vertical, 20)
+                                }
+                                .padding(.horizontal, 20)
+                                .padding(.bottom, 20)
+                            }
+                            
+                            Spacer(minLength: 20)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .frame(height: UIScreen.main.bounds.height * 0.40)
+                    .background(
+                        LinearGradient(
+                            colors: [
+                                Color(.systemGray6),
+                                Color(.systemGray5).opacity(0.5)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                }
+                .navigationBarBackButtonHidden(true)
+                .navigationBarHidden(true)
+                .ignoresSafeArea()
+                .onAppear {
+                    Task {
+                        let email = authViewModel.userEmail
+                        print("🏠 HomePageView main onAppear")
+                        print("   - curriculumOrder: '\(appState.curriculumOrder)'")
                         
-                        Spacer(minLength: 20)
+                        // Only fetch from database if curriculumOrder is completely empty (first load)
+                        if appState.curriculumOrder.isEmpty {
+                            print("   📊 Initial load - fetching from database")
+                            await appState.fetchCurrentDay(for: email)
+                            await fetchCompletedDays()
+                        } else {
+                            print("   ✅ Already have curriculumOrder: \(appState.curriculumOrder)")
+                        }
                     }
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .frame(height: UIScreen.main.bounds.height * 0.40)
-                .background(Color(.systemGray6))
-            }
-            .navigationBarBackButtonHidden(true)
-            .navigationBarHidden(true)
-            .ignoresSafeArea()
-        }
-        .onAppear {
-            Task {
-                let email = authViewModel.userEmail
-                await appState.fetchCurrentDay(for: email)
             }
         }
     }
     
-    // Updated increment function that doesn't trigger fetchContentFromCurriculumOrder immediately
+    // Updated increment function to use authenticated user's email
     private func incrementCurriculumOrderInDatabase(email: String) async {
         do {
             print("Starting increment for email: \(email)")
@@ -469,7 +608,7 @@ struct HomePageView: View {
             let response = try await SupabaseManager.shared.client
                 .from("users")
                 .select("curriculum_order")
-                .eq("email", value: "Utjohnkkim@gmail.com")
+                .eq("email", value: email)
                 .execute()
             
             print("Raw response data: \(String(data: response.data, encoding: .utf8) ?? "nil")")
@@ -487,13 +626,11 @@ struct HomePageView: View {
                 
                 print("Updating to new order: \(newOrderString)")
                 
-                let updateResponse = try await SupabaseManager.shared.client
+                _ = try await SupabaseManager.shared.client
                     .from("users")
                     .update(["curriculum_order": newOrderString])
-                    .eq("email", value: "Utjohnkkim@gmail.com")
+                    .eq("email", value: email)
                     .execute()
-                
-                print("Update response: \(String(data: updateResponse.data, encoding: .utf8) ?? "nil")")
                 
                 await MainActor.run {
                     appState.curriculumOrder = newOrderString
@@ -512,6 +649,7 @@ struct HomePageView: View {
     }
 }
 
+// Helper function remains the same
 func getCurrentWeekNumber(from currentDayText: String) -> Int {
     guard let currentDay = Int(currentDayText), currentDay > 0 else {
         return 1

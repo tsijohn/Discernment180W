@@ -17,6 +17,7 @@ struct D180excursusmens: Codable, Identifiable {
 // MARK: - Table of Contents View
 struct ExcursusView: View {
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var authViewModel: AuthViewModel  // Add this to access logged-in user
     @State private var excursusReadings: [D180excursusmens] = []
     @State private var isLoading = true
     @State private var currentDay: Int = 1
@@ -79,7 +80,7 @@ struct ExcursusView: View {
                     // Excursus List
                     List {
                         ForEach(excursusReadings.sorted(by: { $0.week < $1.week })) { excursus in
-                            NavigationLink(destination: ExcursusDetailView(excursus: excursus)) {
+                            NavigationLink(destination: ExcursusDetailView(excursus: excursus).environmentObject(authViewModel)) {
                                 ExcursusRowView(excursus: excursus, accentColor: accentColor)
                             }
                             .listRowSeparator(.hidden)
@@ -131,14 +132,19 @@ struct ExcursusView: View {
         isLoading = false
     }
     
-    // Fetch current day and completed days from Supabase (copied from NavigationHubView)
+    // Fetch current day and completed days from Supabase (updated to use dynamic user)
     func fetchCurrentDay() async {
+        guard !authViewModel.userEmail.isEmpty else {
+            print("❌ No user email available")
+            return
+        }
+        
         do {
             // Fetch current day
             let result: [[String: String]] = try await SupabaseManager.shared.client
                 .from("users")
                 .select("current_day")
-                .eq("email", value: "Utjohnkkim@gmail.com")
+                .eq("email", value: authViewModel.userEmail)  // Changed from hardcoded email
                 .execute()
                 .value
             
@@ -159,7 +165,7 @@ struct ExcursusView: View {
             let completedResponse = try await SupabaseManager.shared.client
                 .from("users")
                 .select("completed_days")
-                .eq("email", value: "Utjohnkkim@gmail.com")
+                .eq("email", value: authViewModel.userEmail)  // Changed from hardcoded email
                 .execute()
             
             let data = completedResponse.data
@@ -355,6 +361,7 @@ struct ExcursusRowView: View {
 // MARK: - Detail View for Individual Excursus
 struct ExcursusDetailView: View {
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var authViewModel: AuthViewModel  // Add this to access logged-in user
     @State var excursus: D180excursusmens
     @State private var isReadingComplete = false
     
@@ -490,4 +497,11 @@ struct ExcursusDetailCard: View {
     }
 }
 
-// MARK: - Color Extension (copied from NavigationHubView)
+struct ExcursusView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationView {
+            ExcursusView()
+                .environmentObject(AuthViewModel())
+        }
+    }
+}

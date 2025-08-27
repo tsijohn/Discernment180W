@@ -3,6 +3,7 @@ import Supabase
 
 struct NavigationHubView: View {
     @Environment(\.presentationMode) var presentationMode
+    @EnvironmentObject var authViewModel: AuthViewModel  // Add this to access logged-in user
     
     // Group days into weeks for organization
     let weeks = Array(stride(from: 1, to: 181, by: 7)).map { weekStart in
@@ -281,6 +282,13 @@ struct NavigationHubView: View {
             }
             .background(Color(.systemGroupedBackground))
         }
+        .onReceive(NotificationCenter.default.publisher(for: Notification.Name("NavigateToHomeFromDailyReading"))) { _ in
+            // When notification is received, dismiss NavigationHubView after a small delay
+            // to ensure DailyReadingView has dismissed first
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                presentationMode.wrappedValue.dismiss()
+            }
+        }
         .navigationBarHidden(true)
         .onAppear {
             Task {
@@ -429,12 +437,17 @@ struct NavigationHubView: View {
     
     // Fetch the current day and completed days from Supabase
     func fetchCurrentDay() async {
+        guard !authViewModel.userEmail.isEmpty else {
+            print("❌ No user email available")
+            return
+        }
+        
         do {
             // Fetch current day
             let result: [[String: String]] = try await SupabaseManager.shared.client
                 .from("users")
                 .select("current_day")
-                .eq("email", value: "Utjohnkkim@gmail.com")
+                .eq("email", value: authViewModel.userEmail)  // Changed from hardcoded email
                 .execute()
                 .value
             
@@ -455,7 +468,7 @@ struct NavigationHubView: View {
             let completedResponse = try await SupabaseManager.shared.client
                 .from("users")
                 .select("completed_days")
-                .eq("email", value: "Utjohnkkim@gmail.com")
+                .eq("email", value: authViewModel.userEmail)  // Changed from hardcoded email
                 .execute()
             
             let data = completedResponse.data
@@ -566,6 +579,7 @@ struct NavigationHubView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
             NavigationHubView()
+                .environmentObject(AuthViewModel())
         }
     }
 }

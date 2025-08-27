@@ -3,8 +3,10 @@ import WebKit
 
 struct SplashScreenView: View {
     @State private var showNextView = false
-    @EnvironmentObject var authViewModel: AuthViewModel // Authentication state
-
+    @State private var isActive = false
+    @EnvironmentObject var authViewModel: AuthViewModel
+    @EnvironmentObject var appState: AppState
+    
     var body: some View {
         ZStack {
             // Blue background
@@ -12,7 +14,6 @@ struct SplashScreenView: View {
                 .ignoresSafeArea()
             
             VStack {
-
                 Spacer()
 
                 VStack(spacing: 5) { // Spacing between text elements
@@ -22,9 +23,8 @@ struct SplashScreenView: View {
                         .scaledToFit()
                         .frame(width: 240, height: 240) // Adjust size as needed
                         .padding(.bottom, 5)
-                        .padding(.top, -110) 
+                        .padding(.top, -110)
                         .foregroundColor(.white) // Apply white tint
-
 
                     Text("A Six-Month Guide for Catholic Men to Discern the Priesthood")
                         .font(.system(size: 25, weight: .bold))
@@ -42,10 +42,14 @@ struct SplashScreenView: View {
             }
         }
         .fullScreenCover(isPresented: $showNextView) {
-            if authViewModel.isLoggedIn {
+            if authViewModel.isAuthenticated {
                 HomePageView()
+                    .environmentObject(authViewModel)
+                    .environmentObject(appState)
             } else {
-                HomePageView()
+                VideoPlayerView()
+                    .environmentObject(authViewModel)
+                    .environmentObject(appState)
             }
         }
     }

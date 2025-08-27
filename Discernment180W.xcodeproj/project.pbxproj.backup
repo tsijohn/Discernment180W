@@ -57,6 +57,7 @@
 		52CE72C22D31A36D001E7C70 /* Discernment180.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 52CE72C02D31A36D001E7C70 /* Discernment180.xcdatamodeld */; };
 		52CE72C82D31ABA4001E7C70 /* PersistanceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CE72C72D31AB91001E7C70 /* PersistanceController.swift */; };
 		52CE89172E4D126500A2D4F8 /* Day0View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52CE89162E4D126500A2D4F8 /* Day0View.swift */; };
+		52DB19CB2D67C43F006AF6D5 /* WeeklyReview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DB19CA2D67C43F006AF6D5 /* WeeklyReview.swift */; };
 		52E92AC22DF0F9A200F5DB3B /* ResourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52E92AC12DF0F9A200F5DB3B /* ResourceView.swift */; };
 		52EFCE232CF02BF800912C47 /* d180.txt in Resources */ = {isa = PBXBuildFile; fileRef = 52EFCE222CF02BF800912C47 /* d180.txt */; };
 		52EFCE252CF031A300912C47 /* VideoPlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52EFCE242CF031A300912C47 /* VideoPlayerView.swift */; };
@@ -64,8 +65,14 @@
 		52F482F42D35B396003F3874 /* SupabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F482F32D35B391003F3874 /* SupabaseManager.swift */; };
 		52F482F82D35B719003F3874 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 52F482F72D35B719003F3874 /* Supabase */; };
 		52F9B7E02CC2E05000B28BB3 /* LetterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F9B7DF2CC2E05000B28BB3 /* LetterView.swift */; };
-		800F68832E5F501800D39BB2 /* WeekReviewSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F68822E5F501800D39BB2 /* WeekReviewSections.swift */; };
-		800F68842E5F501800D39BB2 /* WeekReviewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F68812E5F501800D39BB2 /* WeekReviewModels.swift */; };
+		800F68722E5E707800D39BB2 /* WeekReviewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F68712E5E707800D39BB2 /* WeekReviewModels.swift */; };
+		800F68742E5E708800D39BB2 /* WeekReviewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F68732E5E708800D39BB2 /* WeekReviewModels.swift */; };
+		800F68762E5E709D00D39BB2 /* WeekReviewDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F68752E5E709D00D39BB2 /* WeekReviewDataManager.swift */; };
+		800F687C2E5E70AB00D39BB2 /* RuleOfLifeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F68782E5E70AB00D39BB2 /* RuleOfLifeView.swift */; };
+		800F687D2E5E70AB00D39BB2 /* WeekReviewSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F687B2E5E70AB00D39BB2 /* WeekReviewSections.swift */; };
+		800F687E2E5E70AB00D39BB2 /* WeekNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F68792E5E70AB00D39BB2 /* WeekNavigationView.swift */; };
+		800F687F2E5E70AB00D39BB2 /* WeekReviewHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F687A2E5E70AB00D39BB2 /* WeekReviewHeader.swift */; };
+		800F68802E5E70AB00D39BB2 /* PlanningAheadView 2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F68772E5E70AB00D39BB2 /* PlanningAheadView 2.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -143,14 +150,21 @@
 		52CE72C12D31A36D001E7C70 /* Discernment180.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Discernment180.xcdatamodel; sourceTree = "<group>"; };
 		52CE72C72D31AB91001E7C70 /* PersistanceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistanceController.swift; sourceTree = "<group>"; };
 		52CE89162E4D126500A2D4F8 /* Day0View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Day0View.swift; sourceTree = "<group>"; };
+		52DB19CA2D67C43F006AF6D5 /* WeeklyReview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeeklyReview.swift; sourceTree = "<group>"; };
 		52E92AC12DF0F9A200F5DB3B /* ResourceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResourceView.swift; sourceTree = "<group>"; };
 		52EFCE222CF02BF800912C47 /* d180.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = d180.txt; sourceTree = "<group>"; };
 		52EFCE242CF031A300912C47 /* VideoPlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoPlayerView.swift; sourceTree = "<group>"; };
 		52EFCE262CF0339700912C47 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		52F482F32D35B391003F3874 /* SupabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupabaseManager.swift; sourceTree = "<group>"; };
 		52F9B7DF2CC2E05000B28BB3 /* LetterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LetterView.swift; sourceTree = "<group>"; };
-		800F68812E5F501800D39BB2 /* WeekReviewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekReviewModels.swift; sourceTree = "<group>"; };
-		800F68822E5F501800D39BB2 /* WeekReviewSections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekReviewSections.swift; sourceTree = "<group>"; };
+		800F68712E5E707800D39BB2 /* WeekReviewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekReviewModels.swift; sourceTree = "<group>"; };
+		800F68732E5E708800D39BB2 /* WeekReviewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekReviewModels.swift; sourceTree = "<group>"; };
+		800F68752E5E709D00D39BB2 /* WeekReviewDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekReviewDataManager.swift; sourceTree = "<group>"; };
+		800F68772E5E70AB00D39BB2 /* PlanningAheadView 2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PlanningAheadView 2.swift"; sourceTree = "<group>"; };
+		800F68782E5E70AB00D39BB2 /* RuleOfLifeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleOfLifeView.swift; sourceTree = "<group>"; };
+		800F68792E5E70AB00D39BB2 /* WeekNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekNavigationView.swift; sourceTree = "<group>"; };
+		800F687A2E5E70AB00D39BB2 /* WeekReviewHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekReviewHeader.swift; sourceTree = "<group>"; };
+		800F687B2E5E70AB00D39BB2 /* WeekReviewSections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekReviewSections.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -183,6 +197,8 @@
 		5261C02A2C70F2930010F7CD = {
 			isa = PBXGroup;
 			children = (
+				800F68712E5E707800D39BB2 /* WeekReviewModels.swift */,
+				52DB19CA2D67C43F006AF6D5 /* WeeklyReview.swift */,
 				525A0C3C2D2DE94D008FA8F2 /* DailyChecklistModel.swift */,
 				52CE72C02D31A36D001E7C70 /* Discernment180.xcdatamodeld */,
 				5261C0352C70F2930010F7CD /* Discernment180W */,
@@ -207,6 +223,13 @@
 		5261C0352C70F2930010F7CD /* Discernment180W */ = {
 			isa = PBXGroup;
 			children = (
+				800F68772E5E70AB00D39BB2 /* PlanningAheadView 2.swift */,
+				800F68782E5E70AB00D39BB2 /* RuleOfLifeView.swift */,
+				800F68792E5E70AB00D39BB2 /* WeekNavigationView.swift */,
+				800F687A2E5E70AB00D39BB2 /* WeekReviewHeader.swift */,
+				800F687B2E5E70AB00D39BB2 /* WeekReviewSections.swift */,
+				800F68752E5E709D00D39BB2 /* WeekReviewDataManager.swift */,
+				800F68732E5E708800D39BB2 /* WeekReviewModels.swift */,
 				52AD3F272E595A3E00A5CF7F /* RuleOfLifeFormView.swift */,
 				52AD3F252E566B9C00A5CF7F /* MyRuleView.swift */,
 				52CE89162E4D126500A2D4F8 /* Day0View.swift */,
@@ -259,8 +282,6 @@
 				52EFCE262CF0339700912C47 /* WebView.swift */,
 				52C47EFB2CF0D207007B8E46 /* Before180DaysView.swift */,
 				5223DA862D2F383B00393437 /* WeekReviewView.swift */,
-				800F68812E5F501800D39BB2 /* WeekReviewModels.swift */,
-				800F68822E5F501800D39BB2 /* WeekReviewSections.swift */,
 				52BE49ED2D67DCE300EE549F /* File.txt */,
 				5223DA882D2F385800393437 /* WeekPreviewView.swift */,
 			);
@@ -444,15 +465,20 @@
 			buildActionMask = 2147483647;
 			files = (
 				520EC9122C7113620094106D /* QuestionView.swift in Sources */,
+				800F68722E5E707800D39BB2 /* WeekReviewModels.swift in Sources */,
 				52C47EF82CF04A3E007B8E46 /* ColorExtensions.swift in Sources */,
 				52CE72C22D31A36D001E7C70 /* Discernment180.xcdatamodeld in Sources */,
 				52F482F42D35B396003F3874 /* SupabaseManager.swift in Sources */,
 				520EC9162C7121160094106D /* PrayerTimeInputView.swift in Sources */,
 				52CC8C972D3AF77500924222 /* UserProfileView.swift in Sources */,
+				800F68742E5E708800D39BB2 /* WeekReviewModels.swift in Sources */,
 				525CBC552C9412B900D08C8A /* SaveInformationView.swift in Sources */,
+				800F687C2E5E70AB00D39BB2 /* RuleOfLifeView.swift in Sources */,
+				800F687D2E5E70AB00D39BB2 /* WeekReviewSections.swift in Sources */,
+				800F687E2E5E70AB00D39BB2 /* WeekNavigationView.swift in Sources */,
+				800F687F2E5E70AB00D39BB2 /* WeekReviewHeader.swift in Sources */,
+				800F68802E5E70AB00D39BB2 /* PlanningAheadView 2.swift in Sources */,
 				5223DA872D2F383B00393437 /* WeekReviewView.swift in Sources */,
-				800F68832E5F501800D39BB2 /* WeekReviewSections.swift in Sources */,
-				800F68842E5F501800D39BB2 /* WeekReviewModels.swift in Sources */,
 				5223DA852D2F0E6600393437 /* HomePageView.swift in Sources */,
 				520EC9182C7122510094106D /* QuestionsViewModel.swift in Sources */,
 				52CE89172E4D126500A2D4F8 /* Day0View.swift in Sources */,
@@ -466,6 +492,7 @@
 				520EC9102C71133C0094106D /* DailyChecklistViewModel.swift in Sources */,
 				52C7656F2D35C1C4002336AA /* Supabase.swift in Sources */,
 				525999AF2C948AF600A892A1 /* ChecklistItem.swift in Sources */,
+				52DB19CB2D67C43F006AF6D5 /* WeeklyReview.swift in Sources */,
 				520EC90E2C71130A0094106D /* ChecklistModel.swift in Sources */,
 				5261C0392C70F2930010F7CD /* ContentView.swift in Sources */,
 				525999B52C94ABF400A892A1 /* SplashScreenView.swift in Sources */,
@@ -486,6 +513,7 @@
 				5261C0372C70F2930010F7CD /* Discernment180WApp.swift in Sources */,
 				527DA4C42DA8668A00DFEA49 /* PrayersView.swift in Sources */,
 				52CC8C992D3AF7D600924222 /* NavigationHubView.swift in Sources */,
+				800F68762E5E709D00D39BB2 /* WeekReviewDataManager.swift in Sources */,
 				5261C0672C70F4070010F7CD /* ReadingModel.swift in Sources */,
 				520EC91A2C7122950094106D /* MultiQuestionInputView.swift in Sources */,
 				52EFCE252CF031A300912C47 /* VideoPlayerView.swift in Sources */,
