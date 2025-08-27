@@ -115,12 +115,23 @@ struct WeekReviewView: View {
                 
                 Spacer()
                 
-                Text("Week \(weekNumber) Review")
+                Text("Rule")
                     .font(.custom("Georgia", size: 18))
                     .fontWeight(.bold)
                     .foregroundColor(.black)
                 
                 Spacer()
+                
+                // Invisible placeholder to balance the back button
+                HStack(spacing: 6) {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 18, weight: .medium))
+                    Text("Back")
+                        .font(.system(size: 17, weight: .medium))
+                }
+                .opacity(0)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
@@ -190,298 +201,38 @@ struct WeekReviewView: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 2)
                 
-                // Week Navigation Dropdown
-                Button(action: {
-                    withAnimation {
-                        showingWeekPicker.toggle()
-                    }
-                }) {
-                    HStack {
-                        Text("Navigate to Week")
-                            .font(.custom("Georgia", size: 15))
-                            .foregroundColor(.primary)
-                        
-                        Spacer()
-                        
-                        HStack(spacing: 4) {
-                            Text("Week \(weekNumber)")
+                // My Rule Section (moved above)
+                if ruleOfLifeData != nil {
+                    Button(action: {
+                        withAnimation {
+                            showingMyRule.toggle()
+                        }
+                    }) {
+                        HStack {
+                            Text("My Rule")
                                 .font(.custom("Georgia", size: 15))
                                 .fontWeight(.medium)
-                                .foregroundColor(.blue)
+                                .foregroundColor(.primary)
+                                .lineLimit(1)
                             
-                            Image(systemName: showingWeekPicker ? "chevron.up" : "chevron.down")
+                            Spacer()
+                            
+                            Image(systemName: showingMyRule ? "chevron.up" : "chevron.down")
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundColor(.blue)
                         }
-                    }
-                    .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color(.systemBackground))
-                            .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
-                    )
-                }
-                .padding(.horizontal, 16)
-                
-                // Week Picker (shown when dropdown is tapped)
-                if showingWeekPicker {
-                    ScrollView {
-                        VStack(spacing: 0) {
-                            ForEach(1...totalWeeks, id: \.self) { week in
-                                Button(action: {
-                                    saveCurrentDataBeforeNavigating {
-                                        clearAllFormData()
-                                        weekNumber = week
-                                        selectedWeek = week
-                                        showingWeekPicker = false
-                                        isReviewSaved = false
-                                        
-                                        Task {
-                                            await fetchPrayerDays()
-                                            await fetchPlanningAheadData()
-                                            await fetchRuleOfLife()
-                                        }
-                                    }
-                                }) {
-                                    HStack {
-                                        Text("Week \(week)")
-                                            .font(.custom("Georgia", size: 15))
-                                            .foregroundColor(week == weekNumber ? .white : .primary)
-                                        
-                                        Spacer()
-                                        
-                                        if week == weekNumber {
-                                            Image(systemName: "checkmark")
-                                                .font(.system(size: 13, weight: .medium))
-                                                .foregroundColor(.white)
-                                        }
-                                    }
-                                    .padding(.horizontal, 14)
-                                    .padding(.vertical, 10)
-                                    .background(week == weekNumber ? Color.blue : Color.clear)
-                                }
-                                
-                                if week < totalWeeks {
-                                    Divider()
-                                        .padding(.leading, 14)
-                                }
-                            }
-                        }
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(Color(.systemBackground))
-                                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+                                .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
                         )
-                        .padding(.horizontal, 16)
-                    }
-                    .frame(maxHeight: 180)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-                }
-                
-                // Planning Ahead and My Rule sections in the same row
-                HStack(spacing: 10) {
-                    // Planning Ahead Section (expandable)
-                    if planningAheadData != nil {
-                        Button(action: {
-                            withAnimation {
-                                showingPlanningAhead.toggle()
-                            }
-                        }) {
-                            HStack {
-                                Text("Planning Ahead")
-                                    .font(.custom("Georgia", size: 14))
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.primary)
-                                    .lineLimit(1)
-                                
-                                Spacer()
-                                
-                                Image(systemName: showingPlanningAhead ? "chevron.up" : "chevron.down")
-                                    .font(.system(size: 13, weight: .medium))
-                                    .foregroundColor(.blue)
-                            }
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 10)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color(.systemBackground))
-                                    .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
-                            )
-                        }
-                    }
-                    
-                    // My Rule Section (always visible)
-                    if ruleOfLifeData != nil {
-                        Button(action: {
-                            withAnimation {
-                                showingMyRule.toggle()
-                            }
-                        }) {
-                            HStack {
-                                Text("My Rule")
-                                    .font(.custom("Georgia", size: 14))
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.primary)
-                                    .lineLimit(1)
-                                
-                                Spacer()
-                                
-                                Image(systemName: showingMyRule ? "chevron.up" : "chevron.down")
-                                    .font(.system(size: 13, weight: .medium))
-                                    .foregroundColor(.blue)
-                            }
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 10)
-                            .background(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .fill(Color(.systemBackground))
-                                    .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
-                            )
-                        }
-                    }
-                }
-                .padding(.horizontal, 16)
-                
-                // Planning Ahead content (shown when expanded)
-                if showingPlanningAhead, let planData = planningAheadData {
-                    VStack(alignment: .leading, spacing: 16) {
-                        // Mass Scheduled Days
-                        if planData.massScheduledDays.contains(true) {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Mass Scheduled Days:")
-                                    .font(.custom("Georgia", size: 16))
-                                    .fontWeight(.semibold)
-                                
-                                HStack {
-                                    ForEach(0..<7) { index in
-                                        if planData.massScheduledDays[index] {
-                                            Text(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][index])
-                                                .font(.custom("Georgia", size: 14))
-                                                .foregroundColor(.white)
-                                                .padding(.vertical, 4)
-                                                .padding(.horizontal, 8)
-                                                .background(Color.blue)
-                                                .cornerRadius(6)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                        // Confession Scheduled Days
-                        if planData.confessionScheduledDays.contains(true) {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Confession Scheduled Days:")
-                                    .font(.custom("Georgia", size: 16))
-                                    .fontWeight(.semibold)
-                                
-                                HStack {
-                                    ForEach(0..<7) { index in
-                                        if planData.confessionScheduledDays[index] {
-                                            Text(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][index])
-                                                .font(.custom("Georgia", size: 14))
-                                                .foregroundColor(.white)
-                                                .padding(.vertical, 4)
-                                                .padding(.horizontal, 8)
-                                                .background(Color.purple)
-                                                .cornerRadius(6)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        
-                        // Other scheduled items
-                        VStack(alignment: .leading, spacing: 6) {
-                            if planData.altarServiceScheduled == true {
-                                HStack {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.green)
-                                        .font(.system(size: 14))
-                                    Text("Altar Service Scheduled")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                            }
-                            
-                            if planData.spiritualMercyScheduled == true {
-                                HStack {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.green)
-                                        .font(.system(size: 14))
-                                    Text("Spiritual Works of Mercy Scheduled")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                            }
-                            
-                            if planData.corporalMercyScheduled == true {
-                                HStack {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.green)
-                                        .font(.system(size: 14))
-                                    Text("Corporal Works of Mercy Scheduled")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                            }
-                            
-                            if planData.spiritualDirectionScheduled == true {
-                                HStack {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.green)
-                                        .font(.system(size: 14))
-                                    Text("Spiritual Direction Scheduled")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                            }
-                            
-                            if planData.seminaryVisitScheduled == true {
-                                HStack {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.green)
-                                        .font(.system(size: 14))
-                                    Text("Seminary Visit Scheduled")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                            }
-                            
-                            if planData.discernmentRetreatScheduled == true {
-                                HStack {
-                                    Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.green)
-                                        .font(.system(size: 14))
-                                    Text("Discernment Retreat Scheduled")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                            }
-                        }
-                        
-                        // Schedule Notes
-                        if !planData.scheduleNotes.isEmpty {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text("Schedule Notes:")
-                                    .font(.custom("Georgia", size: 16))
-                                    .fontWeight(.semibold)
-                                
-                                Text(planData.scheduleNotes)
-                                    .font(.custom("Georgia", size: 14))
-                                    .foregroundColor(.secondary)
-                                    .padding(12)
-                                    .background(Color(.systemGray6))
-                                    .cornerRadius(8)
-                            }
-                        }
                     }
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color(.secondarySystemBackground))
-                    )
-                    .padding(.horizontal, 16)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
                 }
                 
-                // My Rule content (shown when expanded) - NOW SHOWS ACTUAL DATA
+                // My Rule content (shown when expanded) - RIGHT AFTER MY RULE BUTTON
                 if showingMyRule, let ruleData = ruleOfLifeData {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 20) {
@@ -698,6 +449,272 @@ struct WeekReviewView: View {
                         }
                     }
                     .frame(maxHeight: 400)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color(.secondarySystemBackground))
+                    )
+                    .padding(.horizontal, 16)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                }
+                
+                // Week Review Text (between My Rule and Navigate to Week)
+                Text("Week \(weekNumber) Review")
+                    .font(.custom("Georgia", size: 16))
+                    .fontWeight(.semibold)
+                    .foregroundColor(.primary)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                
+                // Week Navigation Dropdown
+                Button(action: {
+                    withAnimation {
+                        showingWeekPicker.toggle()
+                    }
+                }) {
+                    HStack {
+                        Text("Navigate to Week")
+                            .font(.custom("Georgia", size: 15))
+                            .foregroundColor(.primary)
+                        
+                        Spacer()
+                        
+                        HStack(spacing: 4) {
+                            Text("Week \(weekNumber)")
+                                .font(.custom("Georgia", size: 15))
+                                .fontWeight(.medium)
+                                .foregroundColor(.blue)
+                            
+                            Image(systemName: showingWeekPicker ? "chevron.up" : "chevron.down")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.blue)
+                        }
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color(.systemBackground))
+                            .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                    )
+                }
+                .padding(.horizontal, 16)
+                
+                // Week Picker (shown when dropdown is tapped)
+                if showingWeekPicker {
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            ForEach(1...totalWeeks, id: \.self) { week in
+                                Button(action: {
+                                    saveCurrentDataBeforeNavigating {
+                                        clearAllFormData()
+                                        weekNumber = week
+                                        selectedWeek = week
+                                        showingWeekPicker = false
+                                        isReviewSaved = false
+                                        
+                                        Task {
+                                            await fetchPrayerDays()
+                                            await fetchPlanningAheadData()
+                                            await fetchRuleOfLife()
+                                        }
+                                    }
+                                }) {
+                                    HStack {
+                                        Text("Week \(week)")
+                                            .font(.custom("Georgia", size: 15))
+                                            .foregroundColor(week == weekNumber ? .white : .primary)
+                                        
+                                        Spacer()
+                                        
+                                        if week == weekNumber {
+                                            Image(systemName: "checkmark")
+                                                .font(.system(size: 13, weight: .medium))
+                                                .foregroundColor(.white)
+                                        }
+                                    }
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 10)
+                                    .background(week == weekNumber ? Color.blue : Color.clear)
+                                }
+                                
+                                if week < totalWeeks {
+                                    Divider()
+                                        .padding(.leading, 14)
+                                }
+                            }
+                        }
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color(.systemBackground))
+                                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
+                        )
+                        .padding(.horizontal, 16)
+                    }
+                    .frame(maxHeight: 180)
+                    .transition(.opacity.combined(with: .move(edge: .top)))
+                }
+                
+                // Planning Ahead Section (standalone)
+                if planningAheadData != nil {
+                    Button(action: {
+                        withAnimation {
+                            showingPlanningAhead.toggle()
+                        }
+                    }) {
+                        HStack {
+                            Text("Planning Ahead")
+                                .font(.custom("Georgia", size: 15))
+                                .fontWeight(.medium)
+                                .foregroundColor(.primary)
+                                .lineLimit(1)
+                            
+                            Spacer()
+                            
+                            Image(systemName: showingPlanningAhead ? "chevron.up" : "chevron.down")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundColor(.blue)
+                        }
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color(.systemBackground))
+                                .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                        )
+                    }
+                    .padding(.horizontal, 16)
+                }
+                
+                // Planning Ahead content (shown when expanded)
+                if showingPlanningAhead, let planData = planningAheadData {
+                    VStack(alignment: .leading, spacing: 16) {
+                        // Mass Scheduled Days
+                        if planData.massScheduledDays.contains(true) {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Mass Scheduled Days:")
+                                    .font(.custom("Georgia", size: 16))
+                                    .fontWeight(.semibold)
+                                
+                                HStack {
+                                    ForEach(0..<7) { index in
+                                        if planData.massScheduledDays[index] {
+                                            Text(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][index])
+                                                .font(.custom("Georgia", size: 14))
+                                                .foregroundColor(.white)
+                                                .padding(.vertical, 4)
+                                                .padding(.horizontal, 8)
+                                                .background(Color.blue)
+                                                .cornerRadius(6)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Confession Scheduled Days
+                        if planData.confessionScheduledDays.contains(true) {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Confession Scheduled Days:")
+                                    .font(.custom("Georgia", size: 16))
+                                    .fontWeight(.semibold)
+                                
+                                HStack {
+                                    ForEach(0..<7) { index in
+                                        if planData.confessionScheduledDays[index] {
+                                            Text(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][index])
+                                                .font(.custom("Georgia", size: 14))
+                                                .foregroundColor(.white)
+                                                .padding(.vertical, 4)
+                                                .padding(.horizontal, 8)
+                                                .background(Color.purple)
+                                                .cornerRadius(6)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        
+                        // Other scheduled items
+                        VStack(alignment: .leading, spacing: 6) {
+                            if planData.altarServiceScheduled == true {
+                                HStack {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.green)
+                                        .font(.system(size: 14))
+                                    Text("Altar Service Scheduled")
+                                        .font(.custom("Georgia", size: 14))
+                                }
+                            }
+                            
+                            if planData.spiritualMercyScheduled == true {
+                                HStack {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.green)
+                                        .font(.system(size: 14))
+                                    Text("Spiritual Works of Mercy Scheduled")
+                                        .font(.custom("Georgia", size: 14))
+                                }
+                            }
+                            
+                            if planData.corporalMercyScheduled == true {
+                                HStack {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.green)
+                                        .font(.system(size: 14))
+                                    Text("Corporal Works of Mercy Scheduled")
+                                        .font(.custom("Georgia", size: 14))
+                                }
+                            }
+                            
+                            if planData.spiritualDirectionScheduled == true {
+                                HStack {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.green)
+                                        .font(.system(size: 14))
+                                    Text("Spiritual Direction Scheduled")
+                                        .font(.custom("Georgia", size: 14))
+                                }
+                            }
+                            
+                            if planData.seminaryVisitScheduled == true {
+                                HStack {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.green)
+                                        .font(.system(size: 14))
+                                    Text("Seminary Visit Scheduled")
+                                        .font(.custom("Georgia", size: 14))
+                                }
+                            }
+                            
+                            if planData.discernmentRetreatScheduled == true {
+                                HStack {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundColor(.green)
+                                        .font(.system(size: 14))
+                                    Text("Discernment Retreat Scheduled")
+                                        .font(.custom("Georgia", size: 14))
+                                }
+                            }
+                        }
+                        
+                        // Schedule Notes
+                        if !planData.scheduleNotes.isEmpty {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("Schedule Notes:")
+                                    .font(.custom("Georgia", size: 16))
+                                    .fontWeight(.semibold)
+                                
+                                Text(planData.scheduleNotes)
+                                    .font(.custom("Georgia", size: 14))
+                                    .foregroundColor(.secondary)
+                                    .padding(12)
+                                    .background(Color(.systemGray6))
+                                    .cornerRadius(8)
+                            }
+                        }
+                    }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
                     .background(
