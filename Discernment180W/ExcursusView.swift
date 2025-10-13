@@ -107,14 +107,6 @@ struct ExcursusView: View {
                         .foregroundColor(.primary)
                 }
             }
-            
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title3)
-                        .foregroundColor(.secondary)
-                }
-            }
         }
         .task {
             await loadAllData()
@@ -457,16 +449,10 @@ struct ExcursusDetailCard: View {
             
             Divider()
             
-            if let attributedString = try? AttributedString(markdown: excursus.reading) {
-                Text(attributedString)
-                    .font(.body)
-                    .lineSpacing(6)
-                    .foregroundColor(.primary)
-                    .fixedSize(horizontal: false, vertical: true)
-            } else {
-                Text("Error rendering Markdown")
-                    .foregroundColor(.red)
-            }
+            Text(excursus.reading.htmlToAttributedString())
+                .lineSpacing(6)
+                .tint(accentColor)
+                .fixedSize(horizontal: false, vertical: true)
             
             HStack {
                 Text("Mark as Complete")

@@ -203,7 +203,7 @@ struct HomePageView: View {
             .background(hiddenWeeklyReviewNavigationLink)
         } else {
             NavigationLink(
-                destination: DailyReadingView(day: appState.curriculumOrder, useCurrentDay: true, showSkipButton: true)
+                destination: DailyReadingView(day: appState.curriculumOrder, useCurrentDay: false, showSkipButton: true)
                     .environmentObject(authViewModel)
                     .environmentObject(appState)  // Pass appState to DailyReadingView
             ) {
@@ -312,11 +312,9 @@ struct HomePageView: View {
     var body: some View {
         NavigationView {
             if !authViewModel.isAuthenticated {
-                Text("Please log in")
-                    .font(.custom("Georgia", size: 18))
-                    .onAppear {
-                        authViewModel.logout()
-                    }
+                LoginView()
+                    .environmentObject(authViewModel)
+                    .environmentObject(appState)
             } else {
                 VStack(spacing: 0) {
                     // Enhanced Blue header section with gradient
@@ -356,8 +354,8 @@ struct HomePageView: View {
                                             .stroke(goldGradient.opacity(0.6), lineWidth: 2)
                                             .frame(width: 42, height: 42)
                                         
-                                        Image(systemName: "person.circle.fill")
-                                            .font(.system(size: 40))
+                                        Image(systemName: "line.horizontal.3")
+                                            .font(.system(size: 24, weight: .medium))
                                             .foregroundColor(.white)
                                     }
                                     .padding(.trailing, 20)
@@ -542,13 +540,18 @@ struct HomePageView: View {
                                         .stroke(goldGradient.opacity(0.3), lineWidth: 1)
                                     
                                     VStack(spacing: 10) {
+                                        Image(systemName: "book.fill")
+                                            .font(.system(size: 30))
+                                            .foregroundColor(Color(hexString: "#DAA520"))
+                                            .padding(.bottom, 5)
+                                        
                                         Text("Romans 12:2")
-                                            .font(.custom("Georgia", size: 20))
+                                            .font(.system(size: 20))
                                             .fontWeight(.bold)
                                             .foregroundColor(Color(hexString: "#132A47"))
                                         
                                         Text("\"Be transformed by the renewal of your mind, so you may discern what is good, pleasing, and perfect: the will of God.\"")
-                                            .font(.custom("Georgia", size: 18))
+                                            .font(.system(size: 18))
                                             .fontWeight(.regular)
                                             .foregroundColor(Color(hexString: "#132A47").opacity(0.9))
                                             .multilineTextAlignment(.center)

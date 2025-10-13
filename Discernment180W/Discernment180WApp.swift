@@ -20,12 +20,12 @@ struct Discernment180WApp: App {
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.titleTextAttributes = [
-            .font: UIFont(name: "Georgia", size: 18) ?? UIFont.systemFont(ofSize: 18)
+            .font: UIFont.systemFont(ofSize: 18, weight: .semibold)
         ]
         
         // Customize back button text
         UINavigationBar.appearance().topItem?.backBarButtonItem = UIBarButtonItem(
-            title: "Return", style: .plain, target: nil, action: nil
+            title: "Home", style: .plain, target: nil, action: nil
         )
 
         // Apply appearance

@@ -15,7 +15,7 @@ struct WeekPreviewView: View {
                 // Title and Completion Toggle
                 VStack {
                     Text("Week 2 Preview")
-                        .font(.custom("Georgia", size: 20))
+                        .font(.system(size: 20))
                         .fontWeight(.bold)
                         .foregroundColor(.black)
                         .padding(.top, 10)
@@ -23,7 +23,7 @@ struct WeekPreviewView: View {
                     // Toggle Slider for Completion
                     HStack {
                         Text("Mark as Completed")
-                            .font(.custom("Georgia", size: 16))
+                            .font(.system(size: 16))
                             .foregroundColor(.black)
 
                         Spacer()
@@ -48,13 +48,13 @@ struct WeekPreviewView: View {
                         // Prayer Section
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Prayer")
-                                .font(.custom("Georgia", size: 18))
+                                .font(.system(size: 18))
                                 .fontWeight(.bold)
                                 .foregroundColor(.black)
                                 .padding(.leading, 16)
 
                             Text(previewText)
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(.black)
                                 .lineSpacing(5)
                                 .padding()
@@ -65,13 +65,13 @@ struct WeekPreviewView: View {
                         // Study Section
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Study")
-                                .font(.custom("Georgia", size: 18))
+                                .font(.system(size: 18))
                                 .fontWeight(.bold)
                                 .foregroundColor(.black)
                                 .padding(.leading, 16)
 
                             Text(studyText)
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(.black)
                                 .lineSpacing(5)
                                 .padding()

@@ -5,7 +5,7 @@ struct ResourceView: View {
     
     let featuredResources = [
         Resource(
-            title: "Discernment 180",
+            title: "Discernment 180 (Actual Book)",
             author: "Fr. Greg Gerhart",
             description: "A comprehensive 180-day discernment guide for men considering the priesthood. This book provides daily reflections, prayers, and practical advice for a thorough discernment journey.",
             url: "https://vianneyvocations.com/product/d180/",
@@ -55,7 +55,7 @@ struct ResourceView: View {
         Resource(
             title: "Liturgy of the Hours",
             author: "Hallow / Catholic Tradition",
-            description: "The official daily prayer of the Church, marking the hours of each day and sanctifying the day with prayer. Discernment 180 recommends praying Night Prayer (Compline).",
+            description: "The official daily prayer of the Church, marking the hours of each day and sanctifying the day with prayer. Discernment 180 recommends praying Night Prayer.",
             url: "https://hallow.com/blog/liturgy-of-the-hours/",
             category: .prayer
         ),
@@ -70,7 +70,7 @@ struct ResourceView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Fixed header with back button and home button
+            // Fixed header with back button only
             HStack {
                 Button(action: {
                     presentationMode.wrappedValue.dismiss()
@@ -78,7 +78,7 @@ struct ResourceView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 18, weight: .medium))
-                        Text("Back")
+                        Text("Home")
                             .font(.system(size: 17, weight: .medium))
                     }
                     .foregroundColor(.blue)
@@ -92,67 +92,6 @@ struct ResourceView: View {
                 }
                 
                 Spacer()
-                
-                // Home button
-                Button(action: {
-                    // Multiple approaches to ensure we get to root
-                    
-                    // First dismiss all modal presentations
-                    presentationMode.wrappedValue.dismiss()
-                    
-                    // Then try multiple methods to get to root
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        // Method 1: Try UIKit navigation
-                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                           let window = windowScene.windows.first {
-                            
-                            var currentVC = window.rootViewController
-                            
-                            // Navigate through the hierarchy to find navigation controller
-                            while currentVC != nil {
-                                if let navController = currentVC as? UINavigationController {
-                                    navController.popToRootViewController(animated: true)
-                                    return
-                                } else if let tabController = currentVC as? UITabBarController {
-                                    if let selectedNav = tabController.selectedViewController as? UINavigationController {
-                                        selectedNav.popToRootViewController(animated: true)
-                                        return
-                                    }
-                                } else if let presented = currentVC?.presentedViewController {
-                                    currentVC = presented
-                                } else if let children = currentVC?.children, !children.isEmpty {
-                                    currentVC = children.first
-                                } else {
-                                    break
-                                }
-                            }
-                        }
-                        
-                        // Method 2: Dismiss all and try again
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                               let window = windowScene.windows.first,
-                               let rootNav = window.rootViewController as? UINavigationController {
-                                rootNav.popToRootViewController(animated: true)
-                            }
-                        }
-                    }
-                }) {
-                    HStack(spacing: 6) {
-                        Text("Home")
-                            .font(.system(size: 17, weight: .medium))
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 18, weight: .medium))
-                    }
-                    .foregroundColor(.blue)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color(.systemBackground))
-                            .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1)
-                    )
-                }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)

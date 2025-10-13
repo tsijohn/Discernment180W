@@ -64,6 +64,7 @@ struct RuleOfLifeFormView: View {
     
     // Sacraments Section
     @State private var massTimesPerWeek = ""
+    @State private var selectedMassDays = [Bool](repeating: false, count: 7) // Array for S, M, T, W, Th, F, S
     @State private var additionalMassDays = ""
     @State private var confessionTimesPerMonth = ""
     @State private var sacramentsNotes1 = ""
@@ -89,15 +90,21 @@ struct RuleOfLifeFormView: View {
     @State private var studyNotes1 = ""
     @State private var studyNotes2 = ""
     
-    // Specific Discernment Actions
-    @State private var datingFastCommitment = false
-    @State private var dismissRomanticInterests = false
-    @State private var avoidOneOnOne = false
+    // Specific Discernment Actions (Dating Fast is now static checkmarks)
     @State private var spiritualDirectorName = ""
     @State private var seminaryName = ""
     @State private var seminaryVisitDate = ""
     @State private var retreatName = ""
     @State private var retreatDate = ""
+    
+    // Hours of Prayer selection
+    @State private var selectedHours = Set<String>()
+    let hoursOfPrayer = [
+        "Office of Readings",
+        "Morning Prayer",
+        "Daytime Prayers",
+        "Evening Prayer"
+    ]
     
     @State private var isSaving = false
     @State private var showingSaveConfirmation = false
@@ -115,7 +122,7 @@ struct RuleOfLifeFormView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 18, weight: .medium))
-                        Text("Back")
+                        Text("Home")
                             .font(.system(size: 17, weight: .medium))
                     }
                     .foregroundColor(.blue)
@@ -131,7 +138,7 @@ struct RuleOfLifeFormView: View {
                 Spacer()
                 
                 Text("Rule of Life")
-                    .font(.custom("Georgia", size: 18))
+                    .font(.system(size: 18))
                     .fontWeight(.bold)
                     .foregroundColor(.black)
                 
@@ -140,7 +147,7 @@ struct RuleOfLifeFormView: View {
                 // Empty space for symmetry
                 HStack(spacing: 6) {
                     Image(systemName: "chevron.left")
-                    Text("Back")
+                    Text("Home")
                 }
                 .foregroundColor(.clear)
                 .padding(.horizontal, 12)
@@ -180,7 +187,7 @@ struct RuleOfLifeFormView: View {
                                     .foregroundColor(.white)
                             }
                             Text(isSaving ? "Saving..." : "Save Rule of Life")
-                                .font(.custom("Georgia", size: 18))
+                                .font(.system(size: 18))
                                 .fontWeight(.bold)
                                 .foregroundColor(.white)
                         }
@@ -207,6 +214,14 @@ struct RuleOfLifeFormView: View {
             }
         }
         .navigationBarHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .keyboard) {
+                Button("Done") {
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }
+                .foregroundColor(.blue)
+            }
+        }
         .onAppear {
             Task {
                 await loadExistingRule()
@@ -231,7 +246,7 @@ struct RuleOfLifeFormView: View {
     func prayerSection() -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Prayer")
-                .font(.custom("Georgia", size: 18))
+                .font(.system(size: 18))
                 .fontWeight(.bold)
                 .foregroundColor(.black)
                 .padding(.leading, 16)
@@ -240,81 +255,115 @@ struct RuleOfLifeFormView: View {
                 // Prayer minutes
                 HStack {
                     Text("I will pray for")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                     TextField("60", text: $prayerMinutes)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 60)
                         .keyboardType(.numberPad)
                     Text("minutes every day")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                 }
                 .padding(.horizontal, 16)
                 
                 // Prayer time
                 HStack {
                     Text("My prayer time will be from")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                     TextField("6:00 AM", text: $prayerTimeFrom)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 80)
                     Text("to")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                     TextField("7:00 AM", text: $prayerTimeTo)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 80)
                 }
                 .padding(.horizontal, 16)
                 
-                // Wake up and bedtime
+                // Wake up time
                 HStack {
                     Text("I will wake up at")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                     TextField("5:30 AM", text: $wakeUpTime)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 80)
-                    Text("Bedtime")
-                        .font(.custom("Georgia", size: 16))
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
+
+                // Bedtime
+                HStack {
+                    Text("My bedtime will be")
+                        .font(.system(size: 16))
                     TextField("10:30 PM", text: $bedTime)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 80)
+                    Spacer()
                 }
                 .padding(.horizontal, 16)
+              
+
+                HStack {
+                    Text("(Allow for 7 hours of sleep)")
+                        .font(.system(size: 14))
+                        .italic()
+                        .foregroundColor(.secondary)
+                       
+                }  .padding(.horizontal, 16)
                 
-                Text("(Allow for 7 hours of sleep)")
-                    .font(.custom("Georgia", size: 14))
-                    .italic()
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal, 16)
-                
-                Text("✓ I will pray Night Prayer every night")
-                    .font(.custom("Georgia", size: 16))
-                    .foregroundColor(.blue)
-                    .padding(.horizontal, 16)
-                
+                // Night Prayer - mandatory (always checked)
+                HStack {
+                    Image(systemName: "checkmark.square.fill")
+                        .foregroundColor(.blue)
+                        .font(.system(size: 18))
+                    Text("I will pray Night Prayer every night.")
+                        .font(.system(size: 16))
+                        .foregroundColor(.black)
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 10)
+
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("I will also pray these hours every day:")
-                        .font(.custom("Georgia", size: 16))
+                    Text("I will also pray these hours from the Liturgy of the Hours every day:")
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.horizontal, 16)
-                    
-                    TextEditor(text: $additionalHours)
-                        .font(.custom("Georgia", size: 16))
-                        .foregroundColor(.black)
-                        .padding(8)
-                        .frame(height: 60)
-                        .background(Color.white.opacity(0.9))
-                        .cornerRadius(10)
-                        .padding(.horizontal, 16)
+
+                    // Optional hours
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), alignment: .leading), count: 1), spacing: 8) {
+                        ForEach(hoursOfPrayer, id: \.self) { hour in
+                            Button(action: {
+                                if selectedHours.contains(hour) {
+                                    selectedHours.remove(hour)
+                                } else {
+                                    selectedHours.insert(hour)
+                                }
+                            }) {
+                                HStack {
+                                    Image(systemName: selectedHours.contains(hour) ? "checkmark.square.fill" : "square")
+                                        .foregroundColor(selectedHours.contains(hour) ? .blue : .gray)
+                                        .font(.system(size: 18))
+                                    Text(hour)
+                                        .font(.system(size: 15))
+                                        .foregroundColor(.black)
+                                        .multilineTextAlignment(.leading)
+                                    Spacer()
+                                }
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 16)
                 }
                 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Additional notes:")
-                        .font(.custom("Georgia", size: 16))
+                    Text("(Other Commitments for Prayer):")
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $prayerNotes1)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 80)
@@ -329,67 +378,54 @@ struct RuleOfLifeFormView: View {
     func sacramentsSection() -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Sacraments")
-                .font(.custom("Georgia", size: 18))
+                .font(.system(size: 18))
                 .fontWeight(.bold)
                 .foregroundColor(.black)
                 .padding(.leading, 16)
             
             VStack(alignment: .leading, spacing: 15) {
-                HStack {
-                    Text("I will go to Mass")
-                        .font(.custom("Georgia", size: 16))
-                    TextField("3", text: $massTimesPerWeek)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .frame(width: 50)
-                        .keyboardType(.numberPad)
-                    Text("times a week")
-                        .font(.custom("Georgia", size: 16))
-                }
-                .padding(.horizontal, 16)
-                
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Aside from Sunday, I will go to Mass on:")
-                        .font(.custom("Georgia", size: 16))
+                    Text("I will attend Mass on these days:")
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.horizontal, 16)
                     
-                    TextEditor(text: $additionalMassDays)
-                        .font(.custom("Georgia", size: 16))
-                        .foregroundColor(.black)
-                        .padding(8)
-                        .frame(height: 60)
-                        .background(Color.white.opacity(0.9))
-                        .cornerRadius(10)
-                        .padding(.horizontal, 16)
+                    HStack {
+                        ForEach(0..<7) { index in
+                            Button(action: {
+                                selectedMassDays[index].toggle()
+                                // Update the count
+                                massTimesPerWeek = String(selectedMassDays.filter { $0 }.count)
+                            }) {
+                                Text(["S", "M", "T", "W", "Th", "F", "S"][index])
+                                    .font(.system(size: 16))
+                                    .foregroundColor(selectedMassDays[index] ? .white : .black)
+                                    .padding(.vertical, 5)
+                                    .padding(.horizontal, 10)
+                                    .background(selectedMassDays[index] ? Color.blue : Color.white)
+                                    .cornerRadius(8)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(Color.black, lineWidth: 1)
+                                    )
+                            }
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 10)
                 }
-                
+
                 HStack {
                     Text("I will go to Confession")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                     TextField("2", text: $confessionTimesPerMonth)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 50)
                         .keyboardType(.numberPad)
                     Text("times a month")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                 }
                 .padding(.horizontal, 16)
-                
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("Additional notes:")
-                        .font(.custom("Georgia", size: 16))
-                        .foregroundColor(.black)
-                        .padding(.horizontal, 16)
-                    
-                    TextEditor(text: $sacramentsNotes1)
-                        .font(.custom("Georgia", size: 16))
-                        .foregroundColor(.black)
-                        .padding(8)
-                        .frame(height: 80)
-                        .background(Color.white.opacity(0.9))
-                        .cornerRadius(10)
-                        .padding(.horizontal, 16)
-                }
             }
         }
     }
@@ -397,7 +433,7 @@ struct RuleOfLifeFormView: View {
     func virtueSection() -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Virtue")
-                .font(.custom("Georgia", size: 18))
+                .font(.system(size: 18))
                 .fontWeight(.bold)
                 .foregroundColor(.black)
                 .padding(.leading, 16)
@@ -405,12 +441,12 @@ struct RuleOfLifeFormView: View {
             VStack(alignment: .leading, spacing: 15) {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I will engage in this digital fast:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $digitalFast)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 80)
@@ -421,12 +457,12 @@ struct RuleOfLifeFormView: View {
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I will engage in this bodily fast:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $bodilyFast)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 80)
@@ -436,13 +472,13 @@ struct RuleOfLifeFormView: View {
                 }
                 
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("I will fulfill these practices from hismercyendures.org:")
-                        .font(.custom("Georgia", size: 16))
+                    Text("I will fulfill (if any) practices from hismercyendures.org:")
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $chastityPractices)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 80)
@@ -450,15 +486,15 @@ struct RuleOfLifeFormView: View {
                         .cornerRadius(10)
                         .padding(.horizontal, 16)
                 }
-                
+
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Additional notes:")
-                        .font(.custom("Georgia", size: 16))
+                    Text("(Other commitments for Virtue):")
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.horizontal, 16)
-                    
+
                     TextEditor(text: $virtueNotes1)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 80)
@@ -473,7 +509,7 @@ struct RuleOfLifeFormView: View {
     func serviceSection() -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Service")
-                .font(.custom("Georgia", size: 18))
+                .font(.system(size: 18))
                 .fontWeight(.bold)
                 .foregroundColor(.black)
                 .padding(.leading, 16)
@@ -481,12 +517,12 @@ struct RuleOfLifeFormView: View {
             VStack(alignment: .leading, spacing: 15) {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I will be an altar server at this parish:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $altarServerParish)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 60)
@@ -497,12 +533,12 @@ struct RuleOfLifeFormView: View {
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I will do this spiritual work of mercy:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $spiritualWorkOfMercy)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 80)
@@ -513,12 +549,12 @@ struct RuleOfLifeFormView: View {
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I will do this corporal work of mercy:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $corporalWorkOfMercy)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 80)
@@ -526,15 +562,15 @@ struct RuleOfLifeFormView: View {
                         .cornerRadius(10)
                         .padding(.horizontal, 16)
                 }
-                
+
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Additional notes:")
-                        .font(.custom("Georgia", size: 16))
+                    Text("(Other commitments for Service):")
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.horizontal, 16)
-                    
+
                     TextEditor(text: $serviceNotes1)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 80)
@@ -549,7 +585,7 @@ struct RuleOfLifeFormView: View {
     func studySection() -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("Study")
-                .font(.custom("Georgia", size: 18))
+                .font(.system(size: 18))
                 .fontWeight(.bold)
                 .foregroundColor(.black)
                 .padding(.leading, 16)
@@ -557,30 +593,30 @@ struct RuleOfLifeFormView: View {
             VStack(alignment: .leading, spacing: 15) {
                 HStack {
                     Text("I will do spiritual reading for")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                     TextField("30", text: $readingMinutesPerDay)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 50)
                         .keyboardType(.numberPad)
                     Text("minutes a day")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                     TextField("7", text: $readingDaysPerWeek)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 50)
                         .keyboardType(.numberPad)
                     Text("times a week")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                 }
                 .padding(.horizontal, 16)
-                
+
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Additional notes:")
-                        .font(.custom("Georgia", size: 16))
+                    Text("(Other commitments for Study):")
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.horizontal, 16)
-                    
+
                     TextEditor(text: $studyNotes1)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 80)
@@ -595,7 +631,7 @@ struct RuleOfLifeFormView: View {
     func specificDiscernmentSection() -> some View {
         VStack(alignment: .leading, spacing: 20) {
             Text("Specific Discernment Actions")
-                .font(.custom("Georgia", size: 20))
+                .font(.system(size: 20))
                 .fontWeight(.bold)
                 .foregroundColor(.black)
                 .padding(.leading, 16)
@@ -604,74 +640,54 @@ struct RuleOfLifeFormView: View {
             // Dating Fast
             VStack(alignment: .leading, spacing: 10) {
                 Text("Dating Fast")
-                    .font(.custom("Georgia", size: 18))
+                    .font(.system(size: 18))
                     .fontWeight(.bold)
                     .foregroundColor(.black)
                     .padding(.leading, 16)
                 
-                VStack(alignment: .leading, spacing: 15) {
-                    Button(action: { datingFastCommitment.toggle() }) {
-                        HStack {
-                            Image(systemName: datingFastCommitment ? "checkmark.square.fill" : "square")
-                                .foregroundColor(datingFastCommitment ? .blue : .gray)
-                                .font(.system(size: 20))
-                            Text("I will relate to women in the way that a priest relates to women for 180 days")
-                                .font(.custom("Georgia", size: 16))
-                                .foregroundColor(.black)
-                                .multilineTextAlignment(.leading)
-                        }
-                    }
-                    .padding(.horizontal, 16)
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("✓ I will relate to women in the way that a priest relates to women (or, in the way a married man relates to women who are not his wife) for 180 days")
+                        .font(.system(size: 16))
+                        .foregroundColor(.blue)
+                        .padding(.horizontal, 16)
                     
-                    Button(action: { dismissRomanticInterests.toggle() }) {
-                        HStack {
-                            Image(systemName: dismissRomanticInterests ? "checkmark.square.fill" : "square")
-                                .foregroundColor(dismissRomanticInterests ? .blue : .gray)
-                                .font(.system(size: 20))
-                            Text("I will dismiss any romantic interests that arise for 180 days")
-                                .font(.custom("Georgia", size: 16))
-                                .foregroundColor(.black)
-                                .multilineTextAlignment(.leading)
-                        }
-                    }
-                    .padding(.horizontal, 16)
+                    Text("✓ I will dismiss any romantic interests that arise for 180 days")
+                        .font(.system(size: 16))
+                        .foregroundColor(.blue)
+                        .padding(.horizontal, 16)
                     
-                    Button(action: { avoidOneOnOne.toggle() }) {
-                        HStack {
-                            Image(systemName: avoidOneOnOne ? "checkmark.square.fill" : "square")
-                                .foregroundColor(avoidOneOnOne ? .blue : .gray)
-                                .font(.system(size: 20))
-                            Text("I will avoid one-on-one settings with women for 180 days")
-                                .font(.custom("Georgia", size: 16))
-                                .foregroundColor(.black)
-                                .multilineTextAlignment(.leading)
-                        }
-                    }
-                    .padding(.horizontal, 16)
+                    Text("✓ I will avoid one-on-one settings with women for 180 days")
+                        .font(.system(size: 16))
+                        .foregroundColor(.blue)
+                        .padding(.horizontal, 16)
+                    Text("(This does not require avoiding those one-on-one settings required by work or school.)")
+                        .font(.system(size: 16))
+                        .foregroundColor(.blue)
+                        .padding(.horizontal, 16)
                 }
             }
             
             // Spiritual Direction
             VStack(alignment: .leading, spacing: 10) {
                 Text("Spiritual Direction")
-                    .font(.custom("Georgia", size: 18))
+                    .font(.system(size: 18))
                     .fontWeight(.bold)
                     .foregroundColor(.black)
                     .padding(.leading, 16)
                 
                 Text("✓ I will go to spiritual direction once a month")
-                    .font(.custom("Georgia", size: 16))
+                    .font(.system(size: 16))
                     .foregroundColor(.blue)
                     .padding(.horizontal, 16)
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("My spiritual director is:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $spiritualDirectorName)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 60)
@@ -684,54 +700,49 @@ struct RuleOfLifeFormView: View {
             // Visit a Seminary
             VStack(alignment: .leading, spacing: 10) {
                 Text("Visit a Seminary")
-                    .font(.custom("Georgia", size: 18))
+                    .font(.system(size: 18))
                     .fontWeight(.bold)
                     .foregroundColor(.black)
                     .padding(.leading, 16)
                 
                 HStack {
                     Text("I will visit")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                     TextField("St. John's", text: $seminaryName)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 120)
                     Text("Seminary")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                 }
                 .padding(.horizontal, 16)
                 
                 HStack {
                     Text("on this date:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                     TextField("March 15, 2025", text: $seminaryVisitDate)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 150)
                 }
                 .padding(.horizontal, 16)
                 
-                Text("(Start Discernment 180 even if you do not know when you will be able to visit a seminary.)")
-                    .font(.custom("Georgia", size: 14))
-                    .italic()
-                    .foregroundColor(.secondary)
-                    .padding(.horizontal, 16)
             }
             
             // Discernment Retreat
             VStack(alignment: .leading, spacing: 10) {
                 Text("Discernment Retreat")
-                    .font(.custom("Georgia", size: 18))
+                    .font(.system(size: 18))
                     .fontWeight(.bold)
                     .foregroundColor(.black)
                     .padding(.leading, 16)
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I will go on this retreat:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $retreatName)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 60)
@@ -742,12 +753,12 @@ struct RuleOfLifeFormView: View {
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("It takes place on this date:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $retreatDate)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 60)
@@ -756,8 +767,8 @@ struct RuleOfLifeFormView: View {
                         .padding(.horizontal, 16)
                 }
                 
-                Text("(Start Discernment 180 even if you do not know when you will be able to make a retreat.)")
-                    .font(.custom("Georgia", size: 14))
+                Text("(Start Discernment 180 even if you do not know when you will be able to visit a seminary or make a retreat.)")
+                    .font(.system(size: 14))
                     .italic()
                     .foregroundColor(.secondary)
                     .padding(.horizontal, 16)
@@ -778,6 +789,15 @@ struct RuleOfLifeFormView: View {
             }
             
             do {
+                // Convert boolean array to day names
+                let dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+                var selectedDayNames: [String] = []
+                for (index, isSelected) in selectedMassDays.enumerated() {
+                    if isSelected {
+                        selectedDayNames.append(dayNames[index])
+                    }
+                }
+                
                 let ruleData = RuleOfLifeData(
                     user_id: authViewModel.userId,
                     prayer_minutes: prayerMinutes,
@@ -785,10 +805,10 @@ struct RuleOfLifeFormView: View {
                     prayer_time_to: prayerTimeTo,
                     wake_up_time: wakeUpTime,
                     bed_time: bedTime,
-                    additional_hours: additionalHours,
+                    additional_hours: "Night Prayer, " + Array(selectedHours).joined(separator: ", "),
                     prayer_notes1: prayerNotes1,
                     prayer_notes2: prayerNotes2,
-                    mass_times_per_week: massTimesPerWeek,
+                    mass_times_per_week: selectedDayNames.joined(separator: ", "),
                     additional_mass_days: additionalMassDays,
                     confession_times_per_month: confessionTimesPerMonth,
                     sacraments_notes1: sacramentsNotes1,
@@ -807,9 +827,9 @@ struct RuleOfLifeFormView: View {
                     reading_days_per_week: readingDaysPerWeek,
                     study_notes1: studyNotes1,
                     study_notes2: studyNotes2,
-                    dating_fast_commitment: datingFastCommitment,
-                    dismiss_romantic_interests: dismissRomanticInterests,
-                    avoid_one_on_one: avoidOneOnOne,
+                    dating_fast_commitment: true,
+                    dismiss_romantic_interests: true,
+                    avoid_one_on_one: true,
                     spiritual_director_name: spiritualDirectorName,
                     seminary_name: seminaryName,
                     seminary_visit_date: seminaryVisitDate,
@@ -879,11 +899,35 @@ struct RuleOfLifeFormView: View {
                     prayerTimeTo = ruleData["prayer_time_to"] as? String ?? ""
                     wakeUpTime = ruleData["wake_up_time"] as? String ?? ""
                     bedTime = ruleData["bed_time"] as? String ?? ""
-                    additionalHours = ruleData["additional_hours"] as? String ?? ""
+                    
+                    // Load additional hours and convert to Set (excluding Night Prayer which is mandatory)
+                    let hoursString = ruleData["additional_hours"] as? String ?? ""
+                    if !hoursString.isEmpty {
+                        var hours = Set(hoursString.components(separatedBy: ", "))
+                        hours.remove("Night Prayer") // Remove Night Prayer from selectable options
+                        selectedHours = hours
+                    } else {
+                        selectedHours = Set<String>()
+                    }
+                    additionalHours = hoursString
                     prayerNotes1 = ruleData["prayer_notes1"] as? String ?? ""
                     prayerNotes2 = ruleData["prayer_notes2"] as? String ?? ""
                     // Sacraments
-                    massTimesPerWeek = ruleData["mass_times_per_week"] as? String ?? ""
+                    let massDaysString = ruleData["mass_times_per_week"] as? String ?? ""
+                    if !massDaysString.isEmpty {
+                        let dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+                        let selectedDayNames = massDaysString.components(separatedBy: ", ")
+                        selectedMassDays = [Bool](repeating: false, count: 7)
+                        for (index, dayName) in dayNames.enumerated() {
+                            if selectedDayNames.contains(dayName) {
+                                selectedMassDays[index] = true
+                            }
+                        }
+                        massTimesPerWeek = String(selectedMassDays.filter { $0 }.count)
+                    } else {
+                        selectedMassDays = [Bool](repeating: false, count: 7)
+                        massTimesPerWeek = ""
+                    }
                     additionalMassDays = ruleData["additional_mass_days"] as? String ?? ""
                     confessionTimesPerMonth = ruleData["confession_times_per_month"] as? String ?? ""
                     sacramentsNotes1 = ruleData["sacraments_notes1"] as? String ?? ""
@@ -906,9 +950,6 @@ struct RuleOfLifeFormView: View {
                     studyNotes1 = ruleData["study_notes1"] as? String ?? ""
                     studyNotes2 = ruleData["study_notes2"] as? String ?? ""
                     // Specific Discernment
-                    datingFastCommitment = ruleData["dating_fast_commitment"] as? Bool ?? false
-                    dismissRomanticInterests = ruleData["dismiss_romantic_interests"] as? Bool ?? false
-                    avoidOneOnOne = ruleData["avoid_one_on_one"] as? Bool ?? false
                     spiritualDirectorName = ruleData["spiritual_director_name"] as? String ?? ""
                     seminaryName = ruleData["seminary_name"] as? String ?? ""
                     seminaryVisitDate = ruleData["seminary_visit_date"] as? String ?? ""

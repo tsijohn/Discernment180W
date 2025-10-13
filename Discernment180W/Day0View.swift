@@ -12,6 +12,7 @@ struct Day0View: View {
     @State private var showMyRuleSheet = false
     @State private var hasRuleOfLife = false
     @State private var isAuthorsNoteExpanded = false // State for dropdown
+    @State private var showSignUpPage = false
     
     // User session state
     @State private var currentUserEmail: String = ""
@@ -29,24 +30,8 @@ struct Day0View: View {
     var body: some View {
         VStack(spacing: 0) {
             // Header
-            HStack {
-                Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                    HStack(spacing: 6) {
-                        Image(systemName: "chevron.left")
-                        Text("Back")
-                    }
-                    .foregroundColor(.blue)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color(.systemBackground))
-                            .shadow(color: .black.opacity(0.1), radius: 3, x: 0, y: 1)
-                    )
-                }
-                
-                Spacer()
-                
+            ZStack {
+                // Center content
                 HStack(spacing: 10) {
                     Image("D180Logo")
                         .resizable()
@@ -57,24 +42,24 @@ struct Day0View: View {
                         .foregroundColor(.primary)
                 }
                 
-                Spacer()
-                
-                Button(action: {
-                    NotificationCenter.default.post(name: Notification.Name("NavigateToHomeFromDay0"), object: nil)
-                    presentationMode.wrappedValue.dismiss()
-                }) {
-                    HStack(spacing: 6) {
-                        Text("Home")
-                        Image(systemName: "chevron.right")
+                // Back button aligned to leading edge
+                HStack {
+                    Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "chevron.left")
+                            Text("Back")
+                        }
+                        .foregroundColor(.blue)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color(.systemBackground))
+                                .shadow(color: .black.opacity(0.1), radius: 3, x: 0, y: 1)
+                        )
                     }
-                    .foregroundColor(.blue)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color(.systemBackground))
-                            .shadow(color: .black.opacity(0.1), radius: 3, x: 0, y: 1)
-                    )
+                    
+                    Spacer()
                 }
             }
             .padding(.horizontal, 16)
@@ -85,21 +70,73 @@ struct Day0View: View {
             ZStack {
                 backgroundColor.edgesIgnoringSafeArea(.all)
                 
-                if hasUserError {
-                    VStack(spacing: 20) {
-                        Image(systemName: "person.crop.circle.badge.exclamationmark")
-                            .font(.system(size: 60))
-                            .foregroundColor(.secondary)
-                        Text("Please log in to view your readings")
-                            .font(.title2)
-                            .foregroundColor(.secondary)
-                        Text("You need to be logged in to access your personalized content")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal)
+                if !authViewModel.isAuthenticated {
+                    // Preview mode for unauthenticated users
+                    ScrollView {
+                        VStack(spacing: 16) {
+                            // Author's Note Dropdown (always show this)
+                            AuthorsNoteDropdown(
+                                isExpanded: $isAuthorsNoteExpanded,
+                                accentColor: accentColor,
+                                openURL: openURL
+                            )
+                            .padding(.horizontal, 16)
+                            
+                            // Show Day 0 content if available, otherwise show preview text
+                            if let reading = dayZeroReading {
+                                Day0Content(
+                                    reading: reading,
+                                    accentColor: accentColor,
+                                    openURL: openURL
+                                )
+                                .padding(.horizontal, 16)
+                            } else {
+                                // Preview content when reading is not available
+                                VStack(alignment: .leading, spacing: 16) {
+                                    Text("Day 0 Preview")
+                                        .font(.title2)
+                                        .fontWeight(.bold)
+                                    
+                                    Text("Welcome to Discernment 180! This is a 6-month guided discernment program to help you discern whether God is calling you to the priesthood.")
+                                        .font(.body)
+                                        .lineSpacing(6)
+                                    
+                                    Text("To access the full Day 0 content and begin your discernment journey, please sign up for an account.")
+                                        .font(.body)
+                                        .lineSpacing(6)
+                                        .foregroundColor(.secondary)
+                                }
+                                .padding(20)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .fill(Color(.secondarySystemBackground))
+                                        .shadow(color: .black.opacity(0.05), radius: 5, x: 0, y: 2)
+                                )
+                                .padding(.horizontal, 16)
+                            }
+                            
+                            // Start Program button for unauthenticated users
+                            Button(action: {
+                                showSignUpPage = true
+                            }) {
+                                HStack {
+                                    Text("Start Program")
+                                        .font(.system(size: 18))
+                                        .fontWeight(.bold)
+                                    Image(systemName: "arrow.right")
+                                        .font(.system(size: 16, weight: .bold))
+                                }
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color(red: 216 / 255, green: 158 / 255, blue: 99 / 255))
+                                .cornerRadius(10)
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.top, 8)
+                        }
+                        .padding(.vertical, 16)
                     }
-                    .padding()
                 } else if isLoading {
                     VStack {
                         ProgressView()
@@ -135,7 +172,7 @@ struct Day0View: View {
                                         HStack {
                                             Image(systemName: "doc.text.fill")
                                             Text("Edit My Rule of Life")
-                                                .font(.custom("Georgia", size: 18))
+                                                .font(.system(size: 18))
                                                 .fontWeight(.bold)
                                         }
                                         .foregroundColor(.blue)
@@ -153,7 +190,7 @@ struct Day0View: View {
                                     Button(action: handleBegin) {
                                         HStack {
                                             Text("Begin")
-                                                .font(.custom("Georgia", size: 18))
+                                                .font(.system(size: 18))
                                                 .fontWeight(.bold)
                                             Image(systemName: "arrow.right")
                                                 .font(.system(size: 16, weight: .bold))
@@ -170,7 +207,7 @@ struct Day0View: View {
                                         HStack {
                                             Image(systemName: "doc.text.fill")
                                             Text("Complete Rule of Life")
-                                                .font(.custom("Georgia", size: 18))
+                                                .font(.system(size: 18))
                                                 .fontWeight(.bold)
                                         }
                                         .foregroundColor(.white)
@@ -205,10 +242,15 @@ struct Day0View: View {
         }
         .navigationBarHidden(true)
         .task {
-            await loadUserSession()
-            if !hasUserError {
+            if authViewModel.isAuthenticated {
+                await loadUserSession()
+                if !hasUserError {
+                    await loadDay0Content()
+                    await checkRuleOfLife()
+                }
+            } else {
+                // For unauthenticated users, just load the Day 0 content for preview
                 await loadDay0Content()
-                await checkRuleOfLife()
             }
         }
         .sheet(isPresented: $showMyRuleSheet) {
@@ -221,6 +263,11 @@ struct Day0View: View {
                     await checkRuleOfLife()
                 }
             }
+        }
+        .fullScreenCover(isPresented: $showSignUpPage) {
+            SignUpPageView()
+                .environmentObject(authViewModel)
+                .environmentObject(appState)
         }
     }
     

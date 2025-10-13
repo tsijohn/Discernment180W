@@ -49,7 +49,7 @@ struct NavigationHubView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Fixed header with back button and home button
+            // Fixed header with back button only
             HStack {
                 Button(action: {
                     presentationMode.wrappedValue.dismiss()
@@ -57,7 +57,7 @@ struct NavigationHubView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 18, weight: .medium))
-                        Text("Back")
+                        Text("Home")
                             .font(.system(size: 17, weight: .medium))
                     }
                     .foregroundColor(.blue)
@@ -71,52 +71,6 @@ struct NavigationHubView: View {
                 }
                 
                 Spacer()
-                
-                // Home button
-                Button(action: {
-                    // Dismiss current view and pop to root
-                    presentationMode.wrappedValue.dismiss()
-                    
-                    // Use a slight delay to ensure smooth navigation
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        // Find the navigation controller and pop to root
-                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                           let window = windowScene.windows.first {
-                            
-                            // Try to find and pop navigation stack
-                            func findNavigationController(in viewController: UIViewController?) -> UINavigationController? {
-                                if let navController = viewController as? UINavigationController {
-                                    return navController
-                                }
-                                for child in viewController?.children ?? [] {
-                                    if let found = findNavigationController(in: child) {
-                                        return found
-                                    }
-                                }
-                                return nil
-                            }
-                            
-                            if let navController = findNavigationController(in: window.rootViewController) {
-                                navController.popToRootViewController(animated: true)
-                            }
-                        }
-                    }
-                }) {
-                    HStack(spacing: 6) {
-                        Text("Home")
-                            .font(.system(size: 17, weight: .medium))
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 18, weight: .medium))
-                    }
-                    .foregroundColor(.blue)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color(.systemBackground))
-                            .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1)
-                    )
-                }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
@@ -142,7 +96,7 @@ struct NavigationHubView: View {
                             HStack {
                                 Text("Currently on: ")
                                     .font(.headline)
-                                Text("Day \(currentDay)")
+                                Text("Day \(max(1, currentDay))")
                                     .font(.headline)
                                     .foregroundColor(Color(hexString: "#19223b"))
                                     .padding(.horizontal, 10)
@@ -154,20 +108,18 @@ struct NavigationHubView: View {
                                 
                                 Spacer()
                                 
-                                // FIXED: Use curriculum_order for current day navigation
-                                if let curriculumOrder = dayToCurriculumOrder[currentDay] {
-                                    NavigationLink(destination: DailyReadingView(day: String(curriculumOrder))) {
-                                        Text("Continue")
-                                            .font(.subheadline)
-                                            .fontWeight(.medium)
-                                            .foregroundColor(.white)
-                                            .padding(.horizontal, 14)
-                                            .padding(.vertical, 7)
-                                            .background(
-                                                RoundedRectangle(cornerRadius: 7)
-                                                    .fill(Color(hexString: "#19223b"))
-                                            )
-                                    }
+                                // Use day number for navigation from NavigationHubView
+                                NavigationLink(destination: DailyReadingView(day: String(currentDay), isFromNavigation: true)) {
+                                    Text("Continue")
+                                        .font(.subheadline)
+                                        .fontWeight(.medium)
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 7)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 7)
+                                                .fill(Color(hexString: "#19223b"))
+                                        )
                                 }
                             }
                             
@@ -247,6 +199,55 @@ struct NavigationHubView: View {
                                         .overlay(
                                             RoundedRectangle(cornerRadius: 10)
                                                 .stroke(Color(hexString: "#19223b").opacity(0.2), lineWidth: 1)
+                                        )
+                                )
+                            }
+                            .padding(.horizontal, 16)
+                        }
+                        .padding(.vertical, 8)
+                        
+                        Divider()
+                            .padding(.horizontal, 16)
+                        
+                        // Day 0 Button
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Introduction")
+                                .font(.headline)
+                                .padding(.horizontal, 16)
+                            
+                            NavigationLink(destination: Day0View()
+                                .environmentObject(authViewModel)
+                                .environmentObject(AppState())) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 6) {
+                                        Text("Day 0: Welcome to Discernment 180")
+                                            .font(.subheadline)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(Color(hexString: "#19223b"))
+                                        
+                                        Text("Begin your journey with an introduction to the program")
+                                            .font(.caption)
+                                            .foregroundColor(.secondary)
+                                            .multilineTextAlignment(.leading)
+                                    }
+                                    
+                                    Spacer()
+                                    
+                                    Image(systemName: "star.fill")
+                                        .font(.system(size: 18))
+                                        .foregroundColor(Color(hexString: "#DAA520"))
+                                    
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 12))
+                                        .foregroundColor(.secondary)
+                                }
+                                .padding(14)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(Color(hexString: "#DAA520").opacity(0.08))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .stroke(Color(hexString: "#DAA520").opacity(0.3), lineWidth: 1)
                                         )
                                 )
                             }
@@ -359,16 +360,9 @@ struct NavigationHubView: View {
             if expandedWeek == weekNumber {
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
                     ForEach(weekDays, id: \.self) { day in
-                        // FIXED: Use curriculum_order for navigation
-                        if let curriculumOrder = dayToCurriculumOrder[day] {
-                            NavigationLink(destination: DailyReadingView(day: String(curriculumOrder))) {
-                                dayButton(day: day)
-                            }
-                        } else {
-                            // Fallback if mapping not found
-                            NavigationLink(destination: DailyReadingView(day: String(day))) {
-                                dayButton(day: day)
-                            }
+                        // Use day number for navigation from NavigationHubView
+                        NavigationLink(destination: DailyReadingView(day: String(day), isFromNavigation: true)) {
+                            dayButton(day: day)
                         }
                     }
                 }
@@ -412,7 +406,7 @@ struct NavigationHubView: View {
         do {
             struct DayMapping: Decodable {
                 let day: Int
-                let curriculum_order: Int
+                let curriculum_order: Int?  // Make this optional to handle null values
             }
             
             let mappings: [DayMapping] = try await SupabaseManager.shared.client
@@ -426,7 +420,9 @@ struct NavigationHubView: View {
             DispatchQueue.main.async {
                 // Create the mapping dictionary
                 for mapping in mappings {
-                    self.dayToCurriculumOrder[mapping.day] = mapping.curriculum_order
+                    if let curriculumOrder = mapping.curriculum_order {
+                        self.dayToCurriculumOrder[mapping.day] = curriculumOrder
+                    }
                 }
                 print("Day to curriculum_order mapping loaded: \(self.dayToCurriculumOrder.count) entries")
             }
@@ -494,15 +490,23 @@ struct NavigationProgressIndicator: View {
     let currentDay: Int
     let currentWeek: Int
     
+    private var safeCurrentDay: Int {
+        return max(1, currentDay)
+    }
+    
+    private var safeCurrentWeek: Int {
+        return max(1, currentWeek)
+    }
+    
     private var progressPercentage: Double {
-        return min(Double(currentDay) / 180.0, 1.0)
+        return min(max(Double(safeCurrentDay) / 180.0, 0.0), 1.0)
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             // Progress stats
             HStack {
-                Text("Week \(currentWeek) of 26")
+                Text("Week \(safeCurrentWeek) of 26")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
                     .fontWeight(.medium)

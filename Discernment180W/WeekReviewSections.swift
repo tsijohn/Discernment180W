@@ -5,7 +5,7 @@ extension WeekReviewView {
     func sectionView(title: String, isMassSection: Bool = false, isVirtueSection: Bool = false, isServiceSection: Bool = false, isStudySection: Bool = false) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(title)
-                .font(.custom("Georgia", size: 18))
+                .font(.system(size: 18))
                 .fontWeight(.bold)
                 .foregroundColor(.black)
                 .padding(.leading, 16)
@@ -13,7 +13,7 @@ extension WeekReviewView {
             if title == "Prayer" {
                 // Prayer Section
                 Text("I fulfilled my commitment to daily, personal prayer _ / 7 days this week.")
-                    .font(.custom("Georgia", size: 16))
+                    .font(.system(size: 16))
                     .foregroundColor(.black)
                     .padding(.leading, 16)
                 HStack {
@@ -22,7 +22,7 @@ extension WeekReviewView {
                             massDays[index].toggle()
                         }) {
                             Text(["S", "M", "T", "W", "Th", "F", "S"][index])
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(massDays[index] ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -38,7 +38,7 @@ extension WeekReviewView {
                     .padding(.leading, 16)
                 
                 Text("I fulfilled my commitment to the Liturgy of the Hours _ / 7 days this week.")
-                    .font(.custom("Georgia", size: 16))
+                    .font(.system(size: 16))
                     .foregroundColor(.black)
                     .padding(.leading, 16)
                 HStack {
@@ -47,7 +47,7 @@ extension WeekReviewView {
                             lotrDays[index].toggle()
                         }) {
                             Text(["S", "M", "T", "W", "Th", "F", "S"][index])
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(lotrDays[index] ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -63,7 +63,7 @@ extension WeekReviewView {
                     .padding(.leading, 16)
                 
                 Text("I slept at least 7 hours _ / 7 days this week.")
-                    .font(.custom("Georgia", size: 16))
+                    .font(.system(size: 16))
                     .foregroundColor(.black)
                     .padding(.leading, 16)
                 HStack {
@@ -72,7 +72,7 @@ extension WeekReviewView {
                             sleepDays[index].toggle()
                         }) {
                             Text(["S", "M", "T", "W", "Th", "F", "S"][index])
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(sleepDays[index] ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -89,48 +89,50 @@ extension WeekReviewView {
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("These were the experiences (if any) that I need to bring to prayer and/or spiritual direction:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     
                     TextEditor(text: $prayerNotes)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 100)
                         .background(Color.white.opacity(0.9))
                         .cornerRadius(10)
                         .padding(.horizontal, 16)
+                        .id("prayerNotesField")
                 }.padding(.bottom, 10)
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Based on my responses, I will make the following (if any) adjustments:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     
                     TextEditor(text: $prayerAdjustmentsNotes)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 100)
                         .background(Color.white.opacity(0.9))
                         .cornerRadius(10)
                         .padding(.horizontal, 16)
+                        .id("prayerAdjustmentsField")
                 }.padding(.bottom, 10)
                 
             } else if isMassSection {
                 // Sacraments Section
                 HStack {
                     Text("I fulfilled my commitment to daily Mass this week.")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     Spacer()
                     HStack {
                         Button(action: { dailyMassCommitment = true }) {
                             Text("Yes")
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(dailyMassCommitment == true ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -140,7 +142,7 @@ extension WeekReviewView {
                         }
                         Button(action: { dailyMassCommitment = false }) {
                             Text("No")
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(dailyMassCommitment == false ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -154,14 +156,14 @@ extension WeekReviewView {
                 
                 HStack {
                     Text("I fulfilled (or am on track to fulfill) my commitment to regular Confession.")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     Spacer()
                     HStack {
                         Button(action: { regularConfession = true }) {
                             Text("Yes")
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(regularConfession == true ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -171,7 +173,7 @@ extension WeekReviewView {
                         }
                         Button(action: { regularConfession = false }) {
                             Text("No")
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(regularConfession == false ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -185,40 +187,42 @@ extension WeekReviewView {
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("These were the experiences (if any) that I need to bring to prayer and/or spiritual direction:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     
                     TextEditor(text: $sacramentNotes)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 100)
                         .background(Color.white.opacity(0.9))
                         .cornerRadius(10)
                         .padding(.horizontal, 16)
+                        .id("sacramentNotesField")
                 }.padding(.bottom, 10)
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Based on my responses, I will make the following (if any) adjustments:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     
                     TextEditor(text: $sacramentAdjustmentsNotes)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 100)
                         .background(Color.white.opacity(0.9))
                         .cornerRadius(10)
                         .padding(.horizontal, 16)
+                        .id("sacramentAdjustmentsField")
                 }.padding(.bottom, 10)
                 
             } else if isVirtueSection {
                 // Virtue Section
                 Text("I was faithful to my bodily fast _ / 7 days this week.")
-                    .font(.custom("Georgia", size: 16))
+                    .font(.system(size: 16))
                     .foregroundColor(.black)
                     .padding(.leading, 16)
                 HStack {
@@ -227,7 +231,7 @@ extension WeekReviewView {
                             bodilyFastDays[index].toggle()
                         }) {
                             Text(["S", "M", "T", "W", "Th", "F", "S"][index])
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(bodilyFastDays[index] ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -243,7 +247,7 @@ extension WeekReviewView {
                     .padding(.leading, 16)
                 
                 Text("I was faithful to my digital fast _ / 7 days this week.")
-                    .font(.custom("Georgia", size: 16))
+                    .font(.system(size: 16))
                     .foregroundColor(.black)
                     .padding(.leading, 16)
                 HStack {
@@ -252,7 +256,7 @@ extension WeekReviewView {
                             digitalFastDays[index].toggle()
                         }) {
                             Text(["S", "M", "T", "W", "Th", "F", "S"][index])
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(digitalFastDays[index] ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -269,14 +273,14 @@ extension WeekReviewView {
                 
                 HStack {
                     Text("I was faithful to my dating fast.")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     Spacer()
                     HStack {
                         Button(action: { datingFastCommitment = true }) {
                             Text("Yes")
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(datingFastCommitment == true ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -286,7 +290,7 @@ extension WeekReviewView {
                         }
                         Button(action: { datingFastCommitment = false }) {
                             Text("No")
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(datingFastCommitment == false ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -300,14 +304,14 @@ extension WeekReviewView {
                 
                 HStack {
                     Text("I was faithful to the necessary practices from hismercyendures.org.")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     Spacer()
                     HStack {
                         Button(action: { hmeCommitment = true }) {
                             Text("Yes")
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(hmeCommitment == true ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -317,7 +321,7 @@ extension WeekReviewView {
                         }
                         Button(action: { hmeCommitment = false }) {
                             Text("No")
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(hmeCommitment == false ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -331,48 +335,50 @@ extension WeekReviewView {
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("These were the experiences (if any) that I need to bring to prayer and/or spiritual direction:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     
                     TextEditor(text: $virtueNotes)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 100)
                         .background(Color.white.opacity(0.9))
                         .cornerRadius(10)
                         .padding(.horizontal, 16)
+                        .id("virtueNotesField")
                 }.padding(.bottom, 10)
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Based on my responses, I will make the following (if any) adjustments:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     
                     TextEditor(text: $virtueAdjustmentsNotes)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 100)
                         .background(Color.white.opacity(0.9))
                         .cornerRadius(10)
                         .padding(.horizontal, 16)
+                        .id("virtueAdjustmentsField")
                 }.padding(.bottom, 10)
                 
             } else if isServiceSection {
                 // Service Section
                 HStack {
                     Text("I fulfilled (or am on track to fulfill) my commitment to altar serving.")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     Spacer()
                     HStack {
                         Button(action: { altarServingCommitment = true }) {
                             Text("Yes")
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(altarServingCommitment == true ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -382,7 +388,7 @@ extension WeekReviewView {
                         }
                         Button(action: { altarServingCommitment = false }) {
                             Text("No")
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(altarServingCommitment == false ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -396,14 +402,14 @@ extension WeekReviewView {
                 
                 HStack {
                     Text("I fulfilled (or am on track to fulfill) my commitment to spiritual works of mercy.")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     Spacer()
                     HStack {
                         Button(action: { spiritualMercyCommitment = true }) {
                             Text("Yes")
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(spiritualMercyCommitment == true ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -413,7 +419,7 @@ extension WeekReviewView {
                         }
                         Button(action: { spiritualMercyCommitment = false }) {
                             Text("No")
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(spiritualMercyCommitment == false ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -427,14 +433,14 @@ extension WeekReviewView {
                 
                 HStack {
                     Text("I fulfilled (or am on track to fulfill) my commitment to corporal works of mercy.")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     Spacer()
                     HStack {
                         Button(action: { corporalMercyCommitment = true }) {
                             Text("Yes")
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(corporalMercyCommitment == true ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -444,7 +450,7 @@ extension WeekReviewView {
                         }
                         Button(action: { corporalMercyCommitment = false }) {
                             Text("No")
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(corporalMercyCommitment == false ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -458,48 +464,50 @@ extension WeekReviewView {
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("These were the experiences (if any) that I need to bring to prayer and/or spiritual direction:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     
                     TextEditor(text: $serviceNotes)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 100)
                         .background(Color.white.opacity(0.9))
                         .cornerRadius(10)
                         .padding(.horizontal, 16)
+                        .id("serviceNotesField")
                 }.padding(.bottom, 10)
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Based on my responses, I will make the following (if any) adjustments:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     
                     TextEditor(text: $serviceAdjustmentsNotes)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 100)
                         .background(Color.white.opacity(0.9))
                         .cornerRadius(10)
                         .padding(.horizontal, 16)
+                        .id("serviceAdjustmentsField")
                 }.padding(.bottom, 10)
                 
             } else if isStudySection {
                 // Study Section
                 HStack {
                     Text("Have I fulfilled my commitment to spiritual reading?")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     Spacer()
                     HStack {
                         Button(action: { spiritualReadingCommitment = true }) {
                             Text("Yes")
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(spiritualReadingCommitment == true ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -509,7 +517,7 @@ extension WeekReviewView {
                         }
                         Button(action: { spiritualReadingCommitment = false }) {
                             Text("No")
-                                .font(.custom("Georgia", size: 16))
+                                .font(.system(size: 16))
                                 .foregroundColor(spiritualReadingCommitment == false ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
@@ -523,40 +531,42 @@ extension WeekReviewView {
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I need to bring to prayer and/or spiritual direction")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     
                     TextEditor(text: $studyNotes)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 100)
                         .background(Color.white.opacity(0.9))
                         .cornerRadius(10)
                         .padding(.horizontal, 16)
+                        .id("studyNotesField")
                 }.padding(.bottom, 10)
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Based on my responses, I will make the following (if any) adjustments:")
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(.leading, 16)
                     
                     TextEditor(text: $studyAdjustmentsNotes)
-                        .font(.custom("Georgia", size: 16))
+                        .font(.system(size: 16))
                         .foregroundColor(.black)
                         .padding(8)
                         .frame(height: 100)
                         .background(Color.white.opacity(0.9))
                         .cornerRadius(10)
                         .padding(.horizontal, 16)
+                        .id("studyAdjustmentsField")
                 }.padding(.bottom, 10)
                 
             } else {
                 // Default section
                 Text(loremIpsumText())
-                    .font(.custom("Georgia", size: 16))
+                    .font(.system(size: 16))
                     .foregroundColor(.black)
                     .lineSpacing(5)
                     .padding(.horizontal, 16)

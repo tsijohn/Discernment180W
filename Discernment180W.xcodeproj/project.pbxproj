@@ -66,6 +66,8 @@
 		52F9B7E02CC2E05000B28BB3 /* LetterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52F9B7DF2CC2E05000B28BB3 /* LetterView.swift */; };
 		800F68832E5F501800D39BB2 /* WeekReviewSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F68822E5F501800D39BB2 /* WeekReviewSections.swift */; };
 		800F68842E5F501800D39BB2 /* WeekReviewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 800F68812E5F501800D39BB2 /* WeekReviewModels.swift */; };
+		800F68872E71EA5A00D39BB2 /* welcome_to_discernment_180 (720p).mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 800F68862E71EA5A00D39BB2 /* welcome_to_discernment_180 (720p).mp4 */; };
+		800F68882E71EA5A00D39BB2 /* auto_generated_captions.vtt in Resources */ = {isa = PBXBuildFile; fileRef = 800F68852E71EA5A00D39BB2 /* auto_generated_captions.vtt */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -151,6 +153,8 @@
 		52F9B7DF2CC2E05000B28BB3 /* LetterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LetterView.swift; sourceTree = "<group>"; };
 		800F68812E5F501800D39BB2 /* WeekReviewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekReviewModels.swift; sourceTree = "<group>"; };
 		800F68822E5F501800D39BB2 /* WeekReviewSections.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekReviewSections.swift; sourceTree = "<group>"; };
+		800F68852E71EA5A00D39BB2 /* auto_generated_captions.vtt */ = {isa = PBXFileReference; lastKnownFileType = text; path = auto_generated_captions.vtt; sourceTree = "<group>"; };
+		800F68862E71EA5A00D39BB2 /* welcome_to_discernment_180 (720p).mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "welcome_to_discernment_180 (720p).mp4"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -209,6 +213,7 @@
 			children = (
 				52AD3F272E595A3E00A5CF7F /* RuleOfLifeFormView.swift */,
 				52AD3F252E566B9C00A5CF7F /* MyRuleView.swift */,
+				800F68892E71EA7D00D39BB2 /* videos */,
 				52CE89162E4D126500A2D4F8 /* Day0View.swift */,
 				52BE05242E4BA4F400A8495D /* SpeechManager.swift */,
 				52E92AC12DF0F9A200F5DB3B /* ResourceView.swift */,
@@ -298,6 +303,15 @@
 				52CE72BC2D31949A001E7C70 /* CoreData.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		800F68892E71EA7D00D39BB2 /* videos */ = {
+			isa = PBXGroup;
+			children = (
+				800F68852E71EA5A00D39BB2 /* auto_generated_captions.vtt */,
+				800F68862E71EA5A00D39BB2 /* welcome_to_discernment_180 (720p).mp4 */,
+			);
+			path = videos;
 			sourceTree = "<group>";
 		};
 		FA87633E0A2B2BDC517A9635 /* Pods */ = {
@@ -417,6 +431,8 @@
 				52BE49EE2D67DCE300EE549F /* File.txt in Resources */,
 				5261C03E2C70F2940010F7CD /* Preview Assets.xcassets in Resources */,
 				520EC9142C7116500094106D /* GoogleService-Info.plist in Resources */,
+				800F68872E71EA5A00D39BB2 /* welcome_to_discernment_180 (720p).mp4 in Resources */,
+				800F68882E71EA5A00D39BB2 /* auto_generated_captions.vtt in Resources */,
 				5261C03B2C70F2940010F7CD /* Assets.xcassets in Resources */,
 				52EFCE232CF02BF800912C47 /* d180.txt in Resources */,
 			);
@@ -658,6 +674,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Discernment180W/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = D180;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -667,7 +684,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = Flannery.Discernment180W;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -688,6 +705,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Discernment180W/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = D180;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -697,7 +715,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = Flannery.Discernment180W;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

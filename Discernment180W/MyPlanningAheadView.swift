@@ -17,7 +17,7 @@ struct MyPlanningAheadView: View {
 
             // Planning Ahead Section
             Text("What day(s) will I go to Mass this week?")
-                .font(.custom("Georgia", size: 16))
+                .font(.system(size: 16))
                 .foregroundColor(.black)
                 .padding(.leading, 16)
             HStack {
@@ -26,7 +26,7 @@ struct MyPlanningAheadView: View {
                         massScheduledDays[index].toggle()
                     }) {
                         Text(["S", "M", "T", "W", "Th", "F", "S"][index])
-                            .font(.custom("Georgia", size: 16))
+                            .font(.system(size: 16))
                             .foregroundColor(massScheduledDays[index] ? .white : .black)
                             .padding(.vertical, 5)
                             .padding(.horizontal, 10)
@@ -42,7 +42,7 @@ struct MyPlanningAheadView: View {
                 .padding(.leading, 16)
             
             Text("What day(s) will I go to Confession this week?")
-                .font(.custom("Georgia", size: 16))
+                .font(.system(size: 16))
                 .foregroundColor(.black)
                 .padding(.leading, 16)
             HStack {
@@ -51,7 +51,7 @@ struct MyPlanningAheadView: View {
                         confessionScheduledDays[index].toggle()
                     }) {
                         Text(["S", "M", "T", "W", "Th", "F", "S"][index])
-                            .font(.custom("Georgia", size: 16))
+                            .font(.system(size: 16))
                             .foregroundColor(confessionScheduledDays[index] ? .white : .black)
                             .padding(.vertical, 5)
                             .padding(.horizontal, 10)
@@ -68,7 +68,7 @@ struct MyPlanningAheadView: View {
             
             HStack {
                 Text("When will I make extra time to read the excursus on meditation this week?")
-                    .font(.custom("Georgia", size: 16))
+                    .font(.system(size: 16))
                     .foregroundColor(.black)
                     .padding(.leading, 16)
                     .lineLimit(2)
@@ -86,14 +86,14 @@ struct MyPlanningAheadView: View {
             
             HStack {
                 Text("Spiritual works of mercy?")
-                    .font(.custom("Georgia", size: 16))
+                    .font(.system(size: 16))
                     .foregroundColor(.black)
                     .padding(.leading, 16)
                 Spacer()
                 HStack {
                     Button(action: { isSpiritualMercyScheduled = true }) {
                         Text("Yes")
-                            .font(.custom("Georgia", size: 16))
+                            .font(.system(size: 16))
                             .foregroundColor(isSpiritualMercyScheduled == true ? .white : .black)
                             .padding(.vertical, 5)
                             .padding(.horizontal, 10)
@@ -103,7 +103,7 @@ struct MyPlanningAheadView: View {
                     }
                     Button(action: { isSpiritualMercyScheduled = false }) {
                         Text("No")
-                            .font(.custom("Georgia", size: 16))
+                            .font(.system(size: 16))
                             .foregroundColor(isSpiritualMercyScheduled == false ? .white : .black)
                             .padding(.vertical, 5)
                             .padding(.horizontal, 10)
@@ -117,14 +117,14 @@ struct MyPlanningAheadView: View {
             
             HStack {
                 Text("Corporal works of mercy?")
-                    .font(.custom("Georgia", size: 16))
+                    .font(.system(size: 16))
                     .foregroundColor(.black)
                     .padding(.leading, 16)
                 Spacer()
                 HStack {
                     Button(action: { isCorporalMercyScheduled = true }) {
                         Text("Yes")
-                            .font(.custom("Georgia", size: 16))
+                            .font(.system(size: 16))
                             .foregroundColor(isCorporalMercyScheduled == true ? .white : .black)
                             .padding(.vertical, 5)
                             .padding(.horizontal, 10)
@@ -134,7 +134,7 @@ struct MyPlanningAheadView: View {
                     }
                     Button(action: { isCorporalMercyScheduled = false }) {
                         Text("No")
-                            .font(.custom("Georgia", size: 16))
+                            .font(.system(size: 16))
                             .foregroundColor(isCorporalMercyScheduled == false ? .white : .black)
                             .padding(.vertical, 5)
                             .padding(.horizontal, 10)
@@ -148,12 +148,12 @@ struct MyPlanningAheadView: View {
             
             VStack(alignment: .leading, spacing: 10) {
                 Text("What and when?")
-                    .font(.custom("Georgia", size: 16))
+                    .font(.system(size: 16))
                     .foregroundColor(.black)
                     .padding(.leading, 16)
                 
                 TextEditor(text: $scheduleNotes)
-                    .font(.custom("Georgia", size: 16))
+                    .font(.system(size: 16))
                     .foregroundColor(.black)
                     .padding(8)
                     .frame(height: 40)
@@ -164,14 +164,14 @@ struct MyPlanningAheadView: View {
             
             HStack {
                 Text("Have I scheduled my next spiritual direction?")
-                    .font(.custom("Georgia", size: 16))
+                    .font(.system(size: 16))
                     .foregroundColor(.black)
                     .padding(.leading, 16)
                 Spacer()
                 HStack {
                     Button(action: { isSpiritualDirectionScheduled = true }) {
                         Text("Yes")
-                            .font(.custom("Georgia", size: 16))
+                            .font(.system(size: 16))
                             .foregroundColor(isSpiritualDirectionScheduled == true ? .white : .black)
                             .padding(.vertical, 5)
                             .padding(.horizontal, 10)
@@ -181,7 +181,7 @@ struct MyPlanningAheadView: View {
                     }
                     Button(action: { isSpiritualDirectionScheduled = false }) {
                         Text("No")
-                            .font(.custom("Georgia", size: 16))
+                            .font(.system(size: 16))
                             .foregroundColor(isSpiritualDirectionScheduled == false ? .white : .black)
                             .padding(.vertical, 5)
                             .padding(.horizontal, 10)
@@ -195,14 +195,14 @@ struct MyPlanningAheadView: View {
             
             HStack {
                 Text("Have I scheduled my seminary visit?")
-                    .font(.custom("Georgia", size: 16))
+                    .font(.system(size: 16))
                     .foregroundColor(.black)
                     .padding(.leading, 16)
                 Spacer()
                 HStack {
                     Button(action: { isSeminaryVisitScheduled = true }) {
                         Text("Yes")
-                            .font(.custom("Georgia", size: 16))
+                            .font(.system(size: 16))
                             .foregroundColor(isSeminaryVisitScheduled == true ? .white : .black)
                             .padding(.vertical, 5)
                             .padding(.horizontal, 10)
@@ -212,7 +212,7 @@ struct MyPlanningAheadView: View {
                     }
                     Button(action: { isSeminaryVisitScheduled = false }) {
                         Text("No")
-                            .font(.custom("Georgia", size: 16))
+                            .font(.system(size: 16))
                             .foregroundColor(isSeminaryVisitScheduled == false ? .white : .black)
                             .padding(.vertical, 5)
                             .padding(.horizontal, 10)
@@ -226,14 +226,14 @@ struct MyPlanningAheadView: View {
             
             HStack {
                 Text("Have I scheduled my discernment retreat?")
-                    .font(.custom("Georgia", size: 16))
+                    .font(.system(size: 16))
                     .foregroundColor(.black)
                     .padding(.leading, 16)
                 Spacer()
                 HStack {
                     Button(action: { isDiscernmentRetreatScheduled = true }) {
                         Text("Yes")
-                            .font(.custom("Georgia", size: 16))
+                            .font(.system(size: 16))
                             .foregroundColor(isDiscernmentRetreatScheduled == true ? .white : .black)
                             .padding(.vertical, 5)
                             .padding(.horizontal, 10)
@@ -243,7 +243,7 @@ struct MyPlanningAheadView: View {
                     }
                     Button(action: { isDiscernmentRetreatScheduled = false }) {
                         Text("No")
-                            .font(.custom("Georgia", size: 16))
+                            .font(.system(size: 16))
                             .foregroundColor(isDiscernmentRetreatScheduled == false ? .white : .black)
                             .padding(.vertical, 5)
                             .padding(.horizontal, 10)

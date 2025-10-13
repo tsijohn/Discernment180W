@@ -166,7 +166,7 @@ struct MyRuleView: View {
                                         .textFieldStyle(RoundedBorderTextFieldStyle())
                                         .frame(width: 50)
                                         .keyboardType(.numberPad)
-                                    Text("times per month")
+                                    Text("times a month")
                                 }
                             }
                         }
@@ -281,7 +281,7 @@ struct MyRuleView: View {
                                         .foregroundColor(.white)
                                 }
                                 Text(isSaving ? "Saving..." : "Save My Rule")
-                                    .font(.custom("Georgia", size: 18))
+                                    .font(.system(size: 18))
                                     .fontWeight(.bold)
                             }
                             .foregroundColor(.white)

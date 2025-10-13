@@ -48,7 +48,7 @@ struct PrayersView: View {
         Prayer(
             title: "Suscipe",
             text: """
-            Take, O Lord, and receive my entire liberty, my memory,  my understanding and my whole will. All that I am and all that  I possess, Thou hast given me: I surrender it all to Thee to be  disposed of according to Thy will. Give me only Thy love and 
+            Take Lord, and receive all my liberty, my memory, my understanding, and my entire will, all that I have and possess. Thou hast given all to me. To Thee, O lord, I return it. All is Thine, dispose of it wholly according to Thy will. Give me Thy love and thy grace, for this is sufficient for me.
 
             """
         )
@@ -58,7 +58,7 @@ struct PrayersView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            // Fixed header with back button and home button
+            // Fixed header with back button only
             HStack {
                 Button(action: {
                     presentationMode.wrappedValue.dismiss()
@@ -66,7 +66,7 @@ struct PrayersView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 18, weight: .medium))
-                        Text("Back")
+                        Text("Home")
                             .font(.system(size: 17, weight: .medium))
                     }
                     .foregroundColor(.blue)
@@ -80,67 +80,6 @@ struct PrayersView: View {
                 }
                 
                 Spacer()
-                
-                // Home button
-                Button(action: {
-                    // Multiple approaches to ensure we get to root
-                    
-                    // First dismiss all modal presentations
-                    presentationMode.wrappedValue.dismiss()
-                    
-                    // Then try multiple methods to get to root
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                        // Method 1: Try UIKit navigation
-                        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                           let window = windowScene.windows.first {
-                            
-                            var currentVC = window.rootViewController
-                            
-                            // Navigate through the hierarchy to find navigation controller
-                            while currentVC != nil {
-                                if let navController = currentVC as? UINavigationController {
-                                    navController.popToRootViewController(animated: true)
-                                    return
-                                } else if let tabController = currentVC as? UITabBarController {
-                                    if let selectedNav = tabController.selectedViewController as? UINavigationController {
-                                        selectedNav.popToRootViewController(animated: true)
-                                        return
-                                    }
-                                } else if let presented = currentVC?.presentedViewController {
-                                    currentVC = presented
-                                } else if let children = currentVC?.children, !children.isEmpty {
-                                    currentVC = children.first
-                                } else {
-                                    break
-                                }
-                            }
-                        }
-                        
-                        // Method 2: Dismiss all and try again
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                               let window = windowScene.windows.first,
-                               let rootNav = window.rootViewController as? UINavigationController {
-                                rootNav.popToRootViewController(animated: true)
-                            }
-                        }
-                    }
-                }) {
-                    HStack(spacing: 6) {
-                        Text("Home")
-                            .font(.system(size: 17, weight: .medium))
-                        Image(systemName: "chevron.right")
-                            .font(.system(size: 18, weight: .medium))
-                    }
-                    .foregroundColor(.blue)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(Color(.systemBackground))
-                            .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1)
-                    )
-                }
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)

@@ -34,7 +34,7 @@ struct ContentView: View {
 
                     // Discernment180 logo and title
                     Text("Discernment 180")
-                        .font(.custom("Georgia", size: 28)) // Reduced font size
+                        .font(.system(size: 28)) // Reduced font size
                         .fontWeight(.bold)
                         .foregroundColor(.white)
                         .padding(.top, 5) // Reduced top padding

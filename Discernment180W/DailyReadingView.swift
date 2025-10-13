@@ -8,7 +8,7 @@ struct D180mens: Codable, Identifiable {
     let title: String
     let subtitle: String?
     let day: Int
-    let curriculum_order: Int
+    let curriculum_order: Int?  // Make this optional to handle null values
 }
 
 struct D180Progress: Codable {
@@ -106,6 +106,7 @@ struct DailyReadingView: View {
     var day: String?
     var useCurrentDay: Bool = false
     let showSkipButton: Bool
+    var isFromNavigation: Bool = false  // New parameter to indicate source
 
     @Environment(\.dismiss) var dismiss
     @Environment(\.presentationMode) var presentationMode
@@ -170,10 +171,11 @@ struct DailyReadingView: View {
         return firstReading.title.contains("Preview of Next Week")
     }
     
-    init(day: String? = nil, useCurrentDay: Bool = false, showSkipButton: Bool = false) {
+    init(day: String? = nil, useCurrentDay: Bool = false, showSkipButton: Bool = false, isFromNavigation: Bool = false) {
         self.day = day
         self.useCurrentDay = useCurrentDay
         self.showSkipButton = showSkipButton
+        self.isFromNavigation = isFromNavigation
     }
     
     var body: some View {
@@ -197,14 +199,24 @@ struct DailyReadingView: View {
                     }
                 }
                 Spacer()
-                Button(action: navigateToHome) {
+                if isFromNavigation {
+                    Button(action: navigateToHome) {
+                        HStack(spacing: 6) {
+                            Text("Home")
+                            Image(systemName: "chevron.right")
+                        }
+                        .foregroundColor(.blue)
+                        .padding(.horizontal, 12).padding(.vertical, 6)
+                        .background(RoundedRectangle(cornerRadius: 16).fill(Color(.systemBackground)).shadow(color: .black.opacity(0.1), radius: 3, x: 0, y: 1))
+                    }
+                } else {
+                    // Invisible placeholder to balance the layout when home button is hidden
                     HStack(spacing: 6) {
                         Text("Home")
                         Image(systemName: "chevron.right")
                     }
-                    .foregroundColor(.blue)
+                    .foregroundColor(.clear)
                     .padding(.horizontal, 12).padding(.vertical, 6)
-                    .background(RoundedRectangle(cornerRadius: 16).fill(Color(.systemBackground)).shadow(color: .black.opacity(0.1), radius: 3, x: 0, y: 1))
                 }
             }
             .padding(.horizontal, 16).padding(.vertical, 8).background(Color(.systemGroupedBackground))
@@ -260,17 +272,17 @@ struct DailyReadingView: View {
                                     enhancedPlanningAheadSection
                                 }
                             }
-                            .padding(.horizontal, 16).padding(.top, 8).padding(.bottom, showSkipButton ? 80 : 16)
+                            .padding(.horizontal, 16).padding(.top, 8).padding(.bottom, (showSkipButton || isExcursus) ? 80 : 16)
                             .id(refreshTrigger)
                         }
-                        if showSkipButton && isWeeklyPreview {
+                        if (showSkipButton && isWeeklyPreview) || isExcursus {
                             VStack(spacing: 0) {
                                 Divider()
                                 HStack(spacing: 12) {
                                     Button(action: { if !isSkipping { skipReading() } }) {
                                         HStack {
                                             if isSkipping { ProgressView().scaleEffect(0.8).foregroundColor(.primary) }
-                                            Text(isSkipping ? "Skipping..." : "Skip").font(.custom("Georgia", size: 18)).fontWeight(.bold).foregroundColor(.primary)
+                                            Text(isSkipping ? "Skipping..." : "Skip").font(.system(size: 18)).fontWeight(.bold).foregroundColor(.primary)
                                         }
                                         .frame(maxWidth: .infinity).frame(height: 56).background(Color(.systemGray5)).cornerRadius(10)
                                         .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color(.systemGray3), lineWidth: 1))
@@ -474,7 +486,7 @@ struct DailyReadingView: View {
 
     private var enhancedPlanningAheadSection: some View {
         VStack(alignment: .leading, spacing: 20) {
-            Text("Planning Ahead").font(.custom("Georgia", size: 18)).fontWeight(.bold).padding(.leading, 16)
+            Text("Planning Ahead").font(.system(size: 18)).fontWeight(.bold).padding(.leading, 16)
             
             planningDaySelector(title: "What day(s) will I go to Mass this week:", days: $massScheduledDays)
             planningDaySelector(title: "What day(s) will I go to Confession this week:", days: $confessionScheduledDays)
@@ -482,14 +494,14 @@ struct DailyReadingView: View {
             enhancedPlanningQuestions
             
             VStack(alignment: .leading, spacing: 10) {
-                Text("Additional scheduling notes:").font(.custom("Georgia", size: 16)).padding(.leading, 16)
-                TextEditor(text: $scheduleNotes).font(.custom("Georgia", size: 16)).frame(height: 100).padding(8).background(Color.white.opacity(0.9)).cornerRadius(10).padding(.horizontal, 16)
+                Text("Additional scheduling notes:").font(.system(size: 16)).padding(.leading, 16)
+                TextEditor(text: $scheduleNotes).font(.system(size: 16)).frame(height: 100).padding(8).background(Color.white.opacity(0.9)).cornerRadius(10).padding(.horizontal, 16)
             }
             
             Button(action: { if !isSaving { savePlanningAhead() } }) {
                 HStack {
                     if isSaving { ProgressView().scaleEffect(0.8).foregroundColor(.white) }
-                    Text(isSaving ? "Saving..." : "Save Planning Ahead").font(.custom("Georgia", size: 18)).fontWeight(.bold).foregroundColor(.white)
+                    Text(isSaving ? "Saving..." : "Save Planning Ahead").font(.system(size: 18)).fontWeight(.bold).foregroundColor(.white)
                 }
                 .frame(maxWidth: .infinity).padding().background(isSaving ? Color.gray : Color.blue).cornerRadius(10)
             }
@@ -500,12 +512,12 @@ struct DailyReadingView: View {
 
     private func planningDaySelector(title: String, days: Binding<[Bool]>) -> some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text(title).font(.custom("Georgia", size: 16)).padding(.leading, 16)
+            Text(title).font(.system(size: 16)).padding(.leading, 16)
             HStack {
                 ForEach(0..<7) { index in
                     Button(action: { days.wrappedValue[index].toggle() }) {
                         Text(["S", "M", "T", "W", "Th", "F", "S"][index])
-                            .font(.custom("Georgia", size: 16))
+                            .font(.system(size: 16))
                             .foregroundColor(days.wrappedValue[index] ? .white : .black)
                             .padding(.vertical, 5).padding(.horizontal, 10)
                             .background(days.wrappedValue[index] ? Color.blue : Color.white)
@@ -529,7 +541,7 @@ struct DailyReadingView: View {
     private func planningQuestion(text: String, binding: Binding<Bool?>) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text(text).font(.custom("Georgia", size: 16)).padding(.leading, 16)
+                Text(text).font(.system(size: 16)).padding(.leading, 16)
                 Spacer()
                 HStack {
                     yesNoButton(title: "Yes", value: true, binding: binding)
@@ -542,7 +554,7 @@ struct DailyReadingView: View {
     private func yesNoButton(title: String, value: Bool, binding: Binding<Bool?>) -> some View {
         Button(action: { binding.wrappedValue = value }) {
             Text(title)
-                .font(.custom("Georgia", size: 16))
+                .font(.system(size: 16))
                 .foregroundColor(binding.wrappedValue == value ? .white : .black)
                 .padding(.vertical, 5).padding(.horizontal, 10)
                 .background(binding.wrappedValue == value ? Color.blue : Color.white)
@@ -579,7 +591,7 @@ struct DailyReadingView: View {
                 let weekString = String(firstReading.day_text[weekMatch])
                 if let number = Int(weekString.replacingOccurrences(of: "Week ", with: "")) { return number }
             }
-            return (firstReading.curriculum_order / 7) + 1
+            return ((firstReading.curriculum_order ?? 0) / 7) + 1
         }
         return 1
     }
@@ -626,22 +638,37 @@ struct DailyReadingView: View {
     }
 
     func fetchData() async {
-        guard !currentUserEmail.isEmpty else { return }
+        guard !currentUserEmail.isEmpty else { 
+            print("❌ No current user email, cannot fetch data")
+            return 
+        }
+        
+        print("🚀 fetchData called - useCurrentDay: \(useCurrentDay), day: \(day ?? "nil"), isFromNavigation: \(isFromNavigation)")
         
         if useCurrentDay {
+            print("📍 Using current day path - fetching curriculum_order from database")
             guard let fetchedOrder = await fetchCurriculumOrder() else { return }
+            print("📍 Fetched curriculum_order: \(fetchedOrder)")
             currentDay = fetchedOrder
             originalCurriculumOrder = fetchedOrder
             await fetchReadingsByCurriculumOrder()
         } else if let specifiedDay = day, !specifiedDay.isEmpty {
-            currentDay = specifiedDay
-            originalCurriculumOrder = specifiedDay
-            if let dayNumber = Int(specifiedDay), (1...180).contains(dayNumber) {
-                await fetchReadingsByDay(dayNumber)
+            if isFromNavigation {
+                print("📍 Navigation path: fetching by day number \(specifiedDay)")
+                // When coming from NavigationHubView, use the day number to fetch by day
+                currentDay = specifiedDay
+                if let dayInt = Int(specifiedDay) {
+                    await fetchReadingsByDay(dayInt)
+                }
             } else {
+                print("📍 Home path: fetching by curriculum_order \(specifiedDay)")
+                // When coming from HomePageView, use curriculum_order
+                currentDay = specifiedDay
+                originalCurriculumOrder = specifiedDay
                 await fetchReadingsByCurriculumOrder()
             }
         } else {
+            print("📍 Fallback: fetching current day")
             guard let fetchedDay = await fetchCurrentDay() else { return }
             currentDay = fetchedDay
             originalCurriculumOrder = fetchedDay
@@ -667,14 +694,22 @@ struct DailyReadingView: View {
 
     func fetchReadingsByCurriculumOrder() async {
         do {
-            readings = try await SupabaseManager.shared.client.from("d180mens").select("*").eq("curriculum_order", value: Int(currentDay) ?? 1).execute().value
+            let curriculumOrderInt = Int(currentDay) ?? 1
+            print("🔍 Fetching readings by curriculum_order: \(curriculumOrderInt)")
+            readings = try await SupabaseManager.shared.client.from("d180mens").select("*").eq("curriculum_order", value: curriculumOrderInt).execute().value
+            print("📚 Found \(readings.count) readings for curriculum_order \(curriculumOrderInt)")
+            
             if let firstReading = readings.first {
+                let curriculumOrder = firstReading.curriculum_order ?? 0
+                print("✅ First reading: Day \(firstReading.day), Curriculum Order \(curriculumOrder), Title: \(firstReading.title)")
                 await MainActor.run {
                     if firstReading.day != 0 { self.currentDay = String(firstReading.day) }
                     if self.originalCurriculumOrder.isEmpty { self.originalCurriculumOrder = self.currentDay }
                 }
+            } else {
+                print("❌ No readings found for curriculum_order \(curriculumOrderInt)")
             }
-        } catch { print("Error fetching readings by curriculum_order: \(error)") }
+        } catch { print("❌ Error fetching readings by curriculum_order: \(error)") }
     }
     
     
@@ -688,14 +723,95 @@ struct DailyReadingView: View {
     
     func fetchReadingsByDay(_ dayNumber: Int) async {
         do {
-            readings = try await SupabaseManager.shared.client.from("d180mens").select("*").eq("day", value: dayNumber).execute().value
+            print("🔍 Fetching readings for day: \(dayNumber)")
+            // Try different approaches to ensure we find the record
+            
+            // First attempt: Direct query with Int
+            readings = try await SupabaseManager.shared.client
+                .from("d180mens")
+                .select("*")
+                .eq("day", value: dayNumber)
+                .execute().value
+            
+            print("📚 Found \(readings.count) readings for day \(dayNumber)")
+            
+            if readings.isEmpty {
+                print("🔄 Trying alternative query methods...")
+                
+                // Second attempt: Query with String conversion
+                readings = try await SupabaseManager.shared.client
+                    .from("d180mens")
+                    .select("*")
+                    .eq("day", value: String(dayNumber))
+                    .execute().value
+                
+                print("📚 String query found \(readings.count) readings")
+            }
+            
+            if readings.isEmpty {
+                print("🔄 Trying query all and filter...")
+                
+                // Third attempt: Get all records and filter manually (for debugging)
+                let allReadings: [D180mens] = try await SupabaseManager.shared.client
+                    .from("d180mens")
+                    .select("*")
+                    .execute().value
+                
+                readings = allReadings.filter { $0.day == dayNumber }
+                print("📚 Manual filter found \(readings.count) readings for day \(dayNumber)")
+                
+                // Debug: Show some examples of what days exist
+                let dayNumbers = allReadings.map { $0.day }.sorted()
+                print("🔍 Available days around \(dayNumber): \(dayNumbers.filter { abs($0 - dayNumber) <= 3 })")
+            }
+            
             if let firstReading = readings.first {
+                let curriculumOrder = firstReading.curriculum_order ?? 0
+                print("✅ First reading: Day \(firstReading.day), Curriculum Order \(curriculumOrder), Title: \(firstReading.title)")
                 await MainActor.run {
                     self.currentDay = String(firstReading.day)
-                    self.originalCurriculumOrder = String(firstReading.curriculum_order)
+                    self.originalCurriculumOrder = String(curriculumOrder)
                 }
+            } else {
+                print("❌ No readings found for day \(dayNumber) after all attempts")
+                // Fallback: Try to find the closest available reading
+                await findClosestReading(to: dayNumber)
             }
-        } catch { print("Error fetching readings by day: \(error)") }
+        } catch { 
+            print("❌ Error fetching readings by day \(dayNumber): \(error)") 
+        }
+    }
+    
+    func findClosestReading(to targetDay: Int) async {
+        do {
+            print("🔍 Looking for closest reading to day \(targetDay)")
+            // Get all readings and find the one with the closest day number <= targetDay
+            let allReadings: [D180mens] = try await SupabaseManager.shared.client
+                .from("d180mens")
+                .select("*")
+                .order("day", ascending: true)
+                .execute()
+                .value
+            
+            // Find the highest day number that is <= targetDay
+            let availableReading = allReadings
+                .filter { $0.day > 0 && $0.day <= targetDay }
+                .last
+            
+            if let reading = availableReading {
+                let curriculumOrder = reading.curriculum_order ?? 0
+                print("✅ Found closest reading: Day \(reading.day), Curriculum Order \(curriculumOrder)")
+                await MainActor.run {
+                    self.readings = [reading]
+                    self.currentDay = String(reading.day)
+                    self.originalCurriculumOrder = String(curriculumOrder)
+                }
+            } else {
+                print("❌ No suitable fallback reading found")
+            }
+        } catch {
+            print("❌ Error finding closest reading: \(error)")
+        }
     }
 
     func calculateCurrentWeek(fromDays days: [Int]) -> Int {

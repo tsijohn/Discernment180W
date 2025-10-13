@@ -1,6 +1,7 @@
 import SwiftUI
 import CoreData
 import Supabase
+import Combine
 
 struct WeekReviewView: View {
     @Environment(\.dismiss) private var dismiss
@@ -9,6 +10,7 @@ struct WeekReviewView: View {
     @State var weekNumber: Int
     @State private var showingWeekPicker = false
     @State private var selectedWeek: Int = 1
+    @State private var keyboardHeight: CGFloat = 0
     
     // Add state for planning ahead data
     @State private var showingPlanningAhead = false
@@ -19,7 +21,7 @@ struct WeekReviewView: View {
     // Add parameter to track if opened from home page action
     let showSkipButton: Bool
 
-    private let totalWeeks = 13
+    private let totalWeeks = 26
     
     @State private var prayerDays: Int = 3
     @State private var liturgyOfTheHoursDays: Int = 1
@@ -83,6 +85,23 @@ struct WeekReviewView: View {
     @State private var isReviewSaved = false
     @State private var isSaving = false
     @State private var isSkipping = false
+    @FocusState private var focusedField: Field?
+    
+    enum Field: Hashable {
+        case prayerNotes
+        case prayerAdjustments
+        case sacramentNotes
+        case sacramentAdjustments
+        case virtueNotes
+        case virtueAdjustments
+        case studyNotes
+        case studyAdjustments
+        case serviceNotes
+        case serviceAdjustments
+        case weeklyHighlight
+        case weeklyChallenge
+        case weeklyLesson
+    }
     
     init(weekNumber: Int, showSkipButton: Bool = false) {
         self.weekNumber = weekNumber
@@ -94,13 +113,14 @@ struct WeekReviewView: View {
         VStack(spacing: 0) {
             // Fixed header with back button
             HStack {
+                // Back button
                 Button(action: {
                     dismiss()
                 }) {
                     HStack(spacing: 6) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 18, weight: .medium))
-                        Text("Back")
+                        Text("Home")
                             .font(.system(size: 17, weight: .medium))
                     }
                     .foregroundColor(.blue)
@@ -112,26 +132,35 @@ struct WeekReviewView: View {
                             .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 1)
                     )
                 }
+                .frame(minWidth: 80, alignment: .leading)
                 
                 Spacer()
                 
+                // Centered "Rule" text
                 Text("Rule")
-                    .font(.custom("Georgia", size: 18))
+                    .font(.system(size: 18))
                     .fontWeight(.bold)
                     .foregroundColor(.black)
                 
                 Spacer()
                 
-                // Invisible placeholder to balance the back button
-                HStack(spacing: 6) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 18, weight: .medium))
-                    Text("Back")
-                        .font(.system(size: 17, weight: .medium))
+                // Completion badge aligned to the right
+                HStack(spacing: 3) {
+                    Image(systemName: isReviewSaved ? "checkmark.circle.fill" : "circle")
+                        .foregroundColor(isReviewSaved ? .green : .gray)
+                        .font(.system(size: 16))
+                    Text(isReviewSaved ? "Done" : "")
+                        .font(.system(size: 14))
+                        .fontWeight(.medium)
+                        .foregroundColor(isReviewSaved ? .green : .gray)
                 }
-                .opacity(0)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(
+                    RoundedRectangle(cornerRadius: 6)
+                        .fill(isReviewSaved ? Color.green.opacity(0.1) : Color.clear)
+                )
+                .frame(minWidth: 80, alignment: .trailing)
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 8)
@@ -143,14 +172,14 @@ struct WeekReviewView: View {
                 VStack(alignment: .leading, spacing: 4) {
                     HStack(alignment: .center) {
                         Text("Progress")
-                            .font(.custom("Georgia", size: 15))
+                            .font(.system(size: 15))
                             .fontWeight(.semibold)
                             .foregroundColor(.primary)
                         
                         Spacer()
                         
                         Text("\(weekNumber) of \(totalWeeks) weeks")
-                            .font(.custom("Georgia", size: 15))
+                            .font(.system(size: 15))
                             .fontWeight(.medium)
                             .foregroundColor(.primary)
                     }
@@ -179,289 +208,70 @@ struct WeekReviewView: View {
                             }
                         }
                         .frame(height: 10)
-                        
-                        // Completion badge inline with progress bar
-                        HStack(spacing: 3) {
-                            Image(systemName: isReviewSaved ? "checkmark.circle.fill" : "circle")
-                                .foregroundColor(isReviewSaved ? .green : .gray)
-                                .font(.system(size: 14))
-                            Text(isReviewSaved ? "Done" : "")
-                                .font(.custom("Georgia", size: 12))
-                                .fontWeight(.medium)
-                                .foregroundColor(isReviewSaved ? .green : .gray)
-                        }
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(
-                            RoundedRectangle(cornerRadius: 6)
-                                .fill(isReviewSaved ? Color.green.opacity(0.1) : Color.gray.opacity(0.1))
-                        )
                     }
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 2)
                 
-                // My Rule Section (moved above)
-                if ruleOfLifeData != nil {
-                    Button(action: {
-                        withAnimation {
-                            showingMyRule.toggle()
+                // My Rule Section (moved above) - Always visible now
+                Button(action: {
+                    withAnimation {
+                        showingMyRule.toggle()
+                    }
+                }) {
+                    HStack {
+                        Text("My Rule")
+                            .font(.system(size: 15))
+                            .fontWeight(.medium)
+                            .foregroundColor(.primary)
+                            .lineLimit(1)
+                        
+                        Spacer()
+                        
+                        Image(systemName: showingMyRule ? "chevron.up" : "chevron.down")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(.blue)
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 10)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color(.systemBackground))
+                            .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                    )
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, showingMyRule ? 60 : 0) // Add top padding only when expanded
+                
+                // My Rule content (shown when expanded) - EXTENDS TO 80% OF PAGE
+                if showingMyRule && focusedField == nil {
+                    // Form content that extends to 80% of screen height
+                    GeometryReader { geometry in
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 20) {
+                                RuleOfLifeEmbeddedView()
+                            }
+                            .padding(.vertical, 16)
                         }
-                    }) {
-                        HStack {
-                            Text("My Rule")
-                                .font(.custom("Georgia", size: 15))
-                                .fontWeight(.medium)
-                                .foregroundColor(.primary)
-                                .lineLimit(1)
-                            
-                            Spacer()
-                            
-                            Image(systemName: showingMyRule ? "chevron.up" : "chevron.down")
-                                .font(.system(size: 13, weight: .medium))
-                                .foregroundColor(.blue)
-                        }
-                        .padding(.horizontal, 14)
-                        .padding(.vertical, 10)
+                        .frame(minHeight: geometry.size.height * 0.8)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
                                 .fill(Color(.systemBackground))
-                                .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                                .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
                         )
                     }
+                    .frame(minHeight: UIScreen.main.bounds.height * 0.8)
                     .padding(.horizontal, 16)
-                }
-                
-                // My Rule content (shown when expanded) - RIGHT AFTER MY RULE BUTTON
-                if showingMyRule, let ruleData = ruleOfLifeData {
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 20) {
-                            Text("My Personal Rule of Life")
-                                .font(.custom("Georgia", size: 18))
-                                .fontWeight(.bold)
-                            
-                            // Prayer Section
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("Prayer")
-                                    .font(.custom("Georgia", size: 16))
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.primary)
-                                
-                                if !ruleData.prayerMinutes.isEmpty {
-                                    Text("• I will pray for \(ruleData.prayerMinutes) minutes every day")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                                
-                                if !ruleData.prayerTimeFrom.isEmpty && !ruleData.prayerTimeTo.isEmpty {
-                                    Text("• Prayer time: \(ruleData.prayerTimeFrom) to \(ruleData.prayerTimeTo)")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                                
-                                if !ruleData.wakeUpTime.isEmpty && !ruleData.bedTime.isEmpty {
-                                    Text("• Wake up: \(ruleData.wakeUpTime), Bedtime: \(ruleData.bedTime)")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                                
-                                if !ruleData.additionalHours.isEmpty {
-                                    Text("• Additional prayers: \(ruleData.additionalHours)")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                                
-                                Text("• I will pray Night Prayer every night")
-                                    .font(.custom("Georgia", size: 14))
-                            }
-                            .padding(.bottom, 8)
-                            
-                            // Sacraments Section
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("Sacraments")
-                                    .font(.custom("Georgia", size: 16))
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.primary)
-                                
-                                if !ruleData.massTimesPerWeek.isEmpty {
-                                    Text("• Mass \(ruleData.massTimesPerWeek) times per week")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                                
-                                if !ruleData.additionalMassDays.isEmpty {
-                                    Text("• Additional Mass days: \(ruleData.additionalMassDays)")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                                
-                                if !ruleData.confessionTimesPerMonth.isEmpty {
-                                    Text("• Confession \(ruleData.confessionTimesPerMonth) times per month")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                            }
-                            .padding(.bottom, 8)
-                            
-                            // Virtue Section
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("Virtue")
-                                    .font(.custom("Georgia", size: 16))
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.primary)
-                                
-                                if !ruleData.digitalFast.isEmpty {
-                                    Text("• Digital fast: \(ruleData.digitalFast)")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                                
-                                if !ruleData.bodilyFast.isEmpty {
-                                    Text("• Bodily fast: \(ruleData.bodilyFast)")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                                
-                                if !ruleData.chastityPractices.isEmpty {
-                                    Text("• Chastity practices: \(ruleData.chastityPractices)")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                            }
-                            .padding(.bottom, 8)
-                            
-                            // Service Section
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("Service")
-                                    .font(.custom("Georgia", size: 16))
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.primary)
-                                
-                                if !ruleData.altarServerParish.isEmpty {
-                                    Text("• Altar server at: \(ruleData.altarServerParish)")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                                
-                                if !ruleData.spiritualWorkOfMercy.isEmpty {
-                                    Text("• Spiritual work of mercy: \(ruleData.spiritualWorkOfMercy)")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                                
-                                if !ruleData.corporalWorkOfMercy.isEmpty {
-                                    Text("• Corporal work of mercy: \(ruleData.corporalWorkOfMercy)")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                            }
-                            .padding(.bottom, 8)
-                            
-                            // Study Section
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("Study")
-                                    .font(.custom("Georgia", size: 16))
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.primary)
-                                
-                                if !ruleData.readingMinutesPerDay.isEmpty && !ruleData.readingDaysPerWeek.isEmpty {
-                                    Text("• Spiritual reading: \(ruleData.readingMinutesPerDay) minutes/day, \(ruleData.readingDaysPerWeek) days/week")
-                                        .font(.custom("Georgia", size: 14))
-                                }
-                            }
-                            .padding(.bottom, 8)
-                            
-                            // Specific Discernment Actions
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text("Specific Discernment Actions")
-                                    .font(.custom("Georgia", size: 16))
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.primary)
-                                
-                                // Dating Fast
-                                if ruleData.datingFastCommitment || ruleData.dismissRomanticInterests || ruleData.avoidOneOnOne {
-                                    VStack(alignment: .leading, spacing: 6) {
-                                        Text("Dating Fast (180 days):")
-                                            .font(.custom("Georgia", size: 14))
-                                            .fontWeight(.medium)
-                                        
-                                        if ruleData.datingFastCommitment {
-                                            HStack {
-                                                Image(systemName: "checkmark.circle.fill")
-                                                    .foregroundColor(.green)
-                                                    .font(.system(size: 12))
-                                                Text("Relate to women as a priest would")
-                                                    .font(.custom("Georgia", size: 13))
-                                            }
-                                        }
-                                        
-                                        if ruleData.dismissRomanticInterests {
-                                            HStack {
-                                                Image(systemName: "checkmark.circle.fill")
-                                                    .foregroundColor(.green)
-                                                    .font(.system(size: 12))
-                                                Text("Dismiss romantic interests")
-                                                    .font(.custom("Georgia", size: 13))
-                                            }
-                                        }
-                                        
-                                        if ruleData.avoidOneOnOne {
-                                            HStack {
-                                                Image(systemName: "checkmark.circle.fill")
-                                                    .foregroundColor(.green)
-                                                    .font(.system(size: 12))
-                                                Text("Avoid one-on-one settings with women")
-                                                    .font(.custom("Georgia", size: 13))
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                // Spiritual Direction
-                                VStack(alignment: .leading, spacing: 6) {
-                                    Text("• Monthly spiritual direction")
-                                        .font(.custom("Georgia", size: 14))
-                                    
-                                    if !ruleData.spiritualDirectorName.isEmpty {
-                                        Text("  Director: \(ruleData.spiritualDirectorName)")
-                                            .font(.custom("Georgia", size: 13))
-                                            .foregroundColor(.secondary)
-                                    }
-                                }
-                                
-                                // Seminary Visit
-                                if !ruleData.seminaryName.isEmpty || !ruleData.seminaryVisitDate.isEmpty {
-                                    VStack(alignment: .leading, spacing: 6) {
-                                        if !ruleData.seminaryName.isEmpty {
-                                            Text("• Seminary visit: \(ruleData.seminaryName)")
-                                                .font(.custom("Georgia", size: 14))
-                                        }
-                                        if !ruleData.seminaryVisitDate.isEmpty {
-                                            Text("  Date: \(ruleData.seminaryVisitDate)")
-                                                .font(.custom("Georgia", size: 13))
-                                                .foregroundColor(.secondary)
-                                        }
-                                    }
-                                }
-                                
-                                // Retreat
-                                if !ruleData.retreatName.isEmpty || !ruleData.retreatDate.isEmpty {
-                                    VStack(alignment: .leading, spacing: 6) {
-                                        if !ruleData.retreatName.isEmpty {
-                                            Text("• Retreat: \(ruleData.retreatName)")
-                                                .font(.custom("Georgia", size: 14))
-                                        }
-                                        if !ruleData.retreatDate.isEmpty {
-                                            Text("  Date: \(ruleData.retreatDate)")
-                                                .font(.custom("Georgia", size: 13))
-                                                .foregroundColor(.secondary)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    .frame(maxHeight: 400)
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color(.secondarySystemBackground))
-                    )
-                    .padding(.horizontal, 16)
-                    .transition(.opacity.combined(with: .move(edge: .top)))
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .top).combined(with: .opacity),
+                        removal: .move(edge: .top).combined(with: .opacity)
+                    ))
+                    .zIndex(1) // Ensure it appears above other content
                 }
                 
                 // Week Review Text (between My Rule and Navigate to Week)
                 Text("Week \(weekNumber) Review")
-                    .font(.custom("Georgia", size: 16))
+                    .font(.system(size: 16))
                     .fontWeight(.semibold)
                     .foregroundColor(.primary)
                     .padding(.horizontal, 16)
@@ -475,14 +285,14 @@ struct WeekReviewView: View {
                 }) {
                     HStack {
                         Text("Navigate to Week")
-                            .font(.custom("Georgia", size: 15))
+                            .font(.system(size: 15))
                             .foregroundColor(.primary)
                         
                         Spacer()
                         
                         HStack(spacing: 4) {
                             Text("Week \(weekNumber)")
-                                .font(.custom("Georgia", size: 15))
+                                .font(.system(size: 15))
                                 .fontWeight(.medium)
                                 .foregroundColor(.blue)
                             
@@ -502,7 +312,7 @@ struct WeekReviewView: View {
                 .padding(.horizontal, 16)
                 
                 // Week Picker (shown when dropdown is tapped)
-                if showingWeekPicker {
+                if showingWeekPicker && focusedField == nil {
                     ScrollView {
                         VStack(spacing: 0) {
                             ForEach(1...totalWeeks, id: \.self) { week in
@@ -523,7 +333,7 @@ struct WeekReviewView: View {
                                 }) {
                                     HStack {
                                         Text("Week \(week)")
-                                            .font(.custom("Georgia", size: 15))
+                                            .font(.system(size: 15))
                                             .foregroundColor(week == weekNumber ? .white : .primary)
                                         
                                         Spacer()
@@ -565,7 +375,7 @@ struct WeekReviewView: View {
                     }) {
                         HStack {
                             Text("Planning Ahead")
-                                .font(.custom("Georgia", size: 15))
+                                .font(.system(size: 15))
                                 .fontWeight(.medium)
                                 .foregroundColor(.primary)
                                 .lineLimit(1)
@@ -588,20 +398,20 @@ struct WeekReviewView: View {
                 }
                 
                 // Planning Ahead content (shown when expanded)
-                if showingPlanningAhead, let planData = planningAheadData {
+                if showingPlanningAhead && focusedField == nil, let planData = planningAheadData {
                     VStack(alignment: .leading, spacing: 16) {
                         // Mass Scheduled Days
                         if planData.massScheduledDays.contains(true) {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Mass Scheduled Days:")
-                                    .font(.custom("Georgia", size: 16))
+                                    .font(.system(size: 16))
                                     .fontWeight(.semibold)
                                 
                                 HStack {
                                     ForEach(0..<7) { index in
                                         if planData.massScheduledDays[index] {
                                             Text(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][index])
-                                                .font(.custom("Georgia", size: 14))
+                                                .font(.system(size: 14))
                                                 .foregroundColor(.white)
                                                 .padding(.vertical, 4)
                                                 .padding(.horizontal, 8)
@@ -617,14 +427,14 @@ struct WeekReviewView: View {
                         if planData.confessionScheduledDays.contains(true) {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Confession Scheduled Days:")
-                                    .font(.custom("Georgia", size: 16))
+                                    .font(.system(size: 16))
                                     .fontWeight(.semibold)
                                 
                                 HStack {
                                     ForEach(0..<7) { index in
                                         if planData.confessionScheduledDays[index] {
                                             Text(["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][index])
-                                                .font(.custom("Georgia", size: 14))
+                                                .font(.system(size: 14))
                                                 .foregroundColor(.white)
                                                 .padding(.vertical, 4)
                                                 .padding(.horizontal, 8)
@@ -644,7 +454,7 @@ struct WeekReviewView: View {
                                         .foregroundColor(.green)
                                         .font(.system(size: 14))
                                     Text("Altar Service Scheduled")
-                                        .font(.custom("Georgia", size: 14))
+                                        .font(.system(size: 14))
                                 }
                             }
                             
@@ -654,7 +464,7 @@ struct WeekReviewView: View {
                                         .foregroundColor(.green)
                                         .font(.system(size: 14))
                                     Text("Spiritual Works of Mercy Scheduled")
-                                        .font(.custom("Georgia", size: 14))
+                                        .font(.system(size: 14))
                                 }
                             }
                             
@@ -664,7 +474,7 @@ struct WeekReviewView: View {
                                         .foregroundColor(.green)
                                         .font(.system(size: 14))
                                     Text("Corporal Works of Mercy Scheduled")
-                                        .font(.custom("Georgia", size: 14))
+                                        .font(.system(size: 14))
                                 }
                             }
                             
@@ -674,7 +484,7 @@ struct WeekReviewView: View {
                                         .foregroundColor(.green)
                                         .font(.system(size: 14))
                                     Text("Spiritual Direction Scheduled")
-                                        .font(.custom("Georgia", size: 14))
+                                        .font(.system(size: 14))
                                 }
                             }
                             
@@ -684,7 +494,7 @@ struct WeekReviewView: View {
                                         .foregroundColor(.green)
                                         .font(.system(size: 14))
                                     Text("Seminary Visit Scheduled")
-                                        .font(.custom("Georgia", size: 14))
+                                        .font(.system(size: 14))
                                 }
                             }
                             
@@ -694,7 +504,7 @@ struct WeekReviewView: View {
                                         .foregroundColor(.green)
                                         .font(.system(size: 14))
                                     Text("Discernment Retreat Scheduled")
-                                        .font(.custom("Georgia", size: 14))
+                                        .font(.system(size: 14))
                                 }
                             }
                         }
@@ -703,11 +513,11 @@ struct WeekReviewView: View {
                         if !planData.scheduleNotes.isEmpty {
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("Schedule Notes:")
-                                    .font(.custom("Georgia", size: 16))
+                                    .font(.system(size: 16))
                                     .fontWeight(.semibold)
                                 
                                 Text(planData.scheduleNotes)
-                                    .font(.custom("Georgia", size: 14))
+                                    .font(.system(size: 14))
                                     .foregroundColor(.secondary)
                                     .padding(12)
                                     .background(Color(.systemGray6))
@@ -734,15 +544,80 @@ struct WeekReviewView: View {
                     .ignoresSafeArea()
                 
                 VStack(alignment: .leading, spacing: 15) {
-                    ScrollView {
-                        VStack(alignment: .leading, spacing: 20) {
-                            sectionView(title: "Prayer")
-                            sectionView(title: "Sacraments", isMassSection: true)
-                            sectionView(title: "Virtue", isVirtueSection: true)
-                            sectionView(title: "Service", isServiceSection: true)
-                            sectionView(title: "Study", isStudySection: true)
+                    ScrollViewReader { scrollProxy in
+                        ScrollView {
+                            VStack(alignment: .leading, spacing: 20) {
+                                sectionView(title: "Prayer")
+                                    .id("prayer")
+                                sectionView(title: "Sacraments", isMassSection: true)
+                                    .id("sacraments")
+                                sectionView(title: "Virtue", isVirtueSection: true)
+                                    .id("virtue")
+                                sectionView(title: "Service", isServiceSection: true)
+                                    .id("service")
+                                sectionView(title: "Study", isStudySection: true)
+                                    .id("study")
+                                
+                                // Dynamic padding at bottom based on keyboard height
+                                Color.clear
+                                    .frame(height: keyboardHeight > 0 ? keyboardHeight + 100 : 300)
+                            }
+                            .padding(.top, 8)
                         }
-                        .padding(.top, 8)
+                        .onChange(of: focusedField) { newValue in
+                            // Collapse dropdowns when keyboard appears
+                            if newValue != nil {
+                                showingMyRule = false
+                                showingWeekPicker = false
+                                showingPlanningAhead = false
+                                
+                                // Delay scrolling to allow keyboard to fully appear
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        // Scroll to the appropriate section with better positioning
+                                        switch newValue {
+                                        case .prayerNotes:
+                                            scrollProxy.scrollTo("prayerNotesField", anchor: .top)
+                                        case .prayerAdjustments:
+                                            scrollProxy.scrollTo("prayerAdjustmentsField", anchor: .top)
+                                        case .sacramentNotes:
+                                            scrollProxy.scrollTo("sacramentNotesField", anchor: .top)
+                                        case .sacramentAdjustments:
+                                            scrollProxy.scrollTo("sacramentAdjustmentsField", anchor: .top)
+                                        case .virtueNotes:
+                                            scrollProxy.scrollTo("virtueNotesField", anchor: .top)
+                                        case .virtueAdjustments:
+                                            scrollProxy.scrollTo("virtueAdjustmentsField", anchor: .top)
+                                        case .serviceNotes:
+                                            scrollProxy.scrollTo("serviceNotesField", anchor: .top)
+                                        case .serviceAdjustments:
+                                            scrollProxy.scrollTo("serviceAdjustmentsField", anchor: .top)
+                                        case .studyNotes:
+                                            scrollProxy.scrollTo("studyNotesField", anchor: .top)
+                                        case .studyAdjustments:
+                                            scrollProxy.scrollTo("studyAdjustmentsField", anchor: .top)
+                                        case .weeklyHighlight, .weeklyChallenge, .weeklyLesson:
+                                            scrollProxy.scrollTo("study", anchor: .top)
+                                        case .none:
+                                            break
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    .toolbar {
+                        ToolbarItem(placement: .keyboard) {
+                            HStack {
+                                Spacer()
+                                Button("Done") {
+                                    hideKeyboard()
+                                    focusedField = nil
+                                }
+                                .font(.system(size: 16).weight(.semibold))
+                                .foregroundColor(Color.blue)
+                            }
+                        }
                     }
                     
                     // Updated button section with consistent heights
@@ -760,7 +635,7 @@ struct WeekReviewView: View {
                                             .foregroundColor(.primary)
                                     }
                                     Text(isSkipping ? "Skipping..." : "Skip")
-                                        .font(.custom("Georgia", size: 18))
+                                        .font(.system(size: 18))
                                         .fontWeight(.bold)
                                         .foregroundColor(.primary)
                                 }
@@ -788,7 +663,7 @@ struct WeekReviewView: View {
                                         .foregroundColor(.white)
                                 }
                                 Text(isSaving ? "Saving..." : "Save Weekly Review")
-                                    .font(.custom("Georgia", size: 18))
+                                    .font(.system(size: 18))
                                     .fontWeight(.bold)
                                     .foregroundColor(.white)
                             }
@@ -815,12 +690,28 @@ struct WeekReviewView: View {
             }
         }
         .navigationBarHidden(true)
+        .ignoresSafeArea(.keyboard, edges: .bottom)
         .onAppear {
             selectedWeek = weekNumber
             Task {
                 await fetchPrayerDays()
                 await fetchPlanningAheadData()
                 await fetchRuleOfLife()
+            }
+            
+            // Observe keyboard notifications
+            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notification in
+                if let keyboardFrame = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect {
+                    withAnimation(.easeOut(duration: 0.25)) {
+                        keyboardHeight = keyboardFrame.height
+                    }
+                }
+            }
+            
+            NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { _ in
+                withAnimation(.easeOut(duration: 0.25)) {
+                    keyboardHeight = 0
+                }
             }
         }
         .navigationTitle("")
@@ -1149,6 +1040,10 @@ struct WeekReviewView: View {
     }
     
     // The sectionView and loremIpsumText functions are now in WeekReviewSections.swift extension
+    
+    private func hideKeyboard() {
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
     
     private func saveWeeklyReview() {
         guard !isSaving else { return }
@@ -1483,6 +1378,644 @@ struct WeekReviewView: View {
         isLoading = false
     }
     
+}
+
+// Embedded version of Rule of Life form without navigation
+struct RuleOfLifeEmbeddedView: View {
+    @EnvironmentObject var authViewModel: AuthViewModel
+    
+    // Prayer fields
+    @State private var prayerMinutes = ""
+    @State private var prayerTimeFrom = ""
+    @State private var prayerTimeTo = ""
+    @State private var wakeUpTime = ""
+    @State private var bedTime = ""
+    @State private var additionalHours = ""
+    @State private var prayerNotes1 = ""
+    @State private var prayerNotes2 = ""
+    
+    // Hours of Prayer selection
+    @State private var selectedHours = Set<String>()
+    let hoursOfPrayer = [
+        "Office of Readings",
+        "Morning Prayer",
+        "Daytime Prayers",
+        "Evening Prayer"
+    ]
+    
+    // Sacraments fields
+    @State private var massTimesPerWeek = ""
+    @State private var selectedMassDays = [Bool](repeating: false, count: 7) // Array for S, M, T, W, Th, F, S
+    @State private var additionalMassDays = ""
+    @State private var confessionTimesPerMonth = ""
+    @State private var sacramentsNotes1 = ""
+    @State private var sacramentsNotes2 = ""
+    
+    // Virtue fields
+    @State private var digitalFast = ""
+    @State private var bodilyFast = ""
+    @State private var chastityPractices = ""
+    @State private var virtueNotes1 = ""
+    @State private var virtueNotes2 = ""
+    
+    // Service fields
+    @State private var altarServerParish = ""
+    @State private var spiritualWorkOfMercy = ""
+    @State private var corporalWorkOfMercy = ""
+    @State private var serviceNotes1 = ""
+    @State private var serviceNotes2 = ""
+    
+    // Study fields
+    @State private var readingMinutesPerDay = ""
+    @State private var readingDaysPerWeek = ""
+    @State private var studyNotes1 = ""
+    @State private var studyNotes2 = ""
+    
+    // Specific Discernment fields (Dating Fast is now static checkmarks)
+    @State private var spiritualDirectorName = ""
+    @State private var seminaryName = ""
+    @State private var seminaryVisitDate = ""
+    @State private var retreatName = ""
+    @State private var retreatDate = ""
+    
+    @State private var isLoading = false
+    @State private var isSaving = false
+    @State private var showingSaveConfirmation = false
+    @State private var errorMessage = ""
+    @State private var showingErrorAlert = false
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 20) {
+            // Prayer Section
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Prayer")
+                    .font(.system(size: 18))
+                    .fontWeight(.bold)
+                    .foregroundColor(.black)
+                
+                VStack(alignment: .leading, spacing: 15) {
+                    HStack {
+                        Text("I will pray for")
+                            .font(.system(size: 16))
+                        TextField("60", text: $prayerMinutes)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 60)
+                            .keyboardType(.numberPad)
+                        Text("minutes every day")
+                            .font(.system(size: 16))
+                    }
+                    
+                    HStack {
+                        Text("My prayer time will be from")
+                            .font(.system(size: 16))
+                        TextField("6:00 AM", text: $prayerTimeFrom)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 80)
+                        Text("to")
+                            .font(.system(size: 16))
+                        TextField("7:00 AM", text: $prayerTimeTo)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 80)
+                    }
+                    
+                    HStack {
+                        Text("I will wake up at")
+                            .font(.system(size: 16))
+                        TextField("5:30 AM", text: $wakeUpTime)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 80)
+                        Spacer()
+                    }
+
+                    HStack {
+                        Text("My bedtime will be")
+                            .font(.system(size: 16))
+                        TextField("10:30 PM", text: $bedTime)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 80)
+                        Spacer()
+                    }
+
+                    HStack {
+                        Text("(Allow for 7 hours of sleep)")
+                            .font(.system(size: 14))
+                            .italic()
+                            .foregroundColor(.secondary)
+
+                    }
+                    .padding(.bottom, 10)
+
+                    // Night Prayer - mandatory (always checked)
+                    HStack {
+                        Image(systemName: "checkmark.square.fill")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                        Text("I will pray Night Prayer every night.")
+                            .font(.system(size: 16))
+                            .foregroundColor(.black)
+                        Spacer()
+                    }
+                    .padding(.bottom, 10)
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("I will also pray these hours from the Liturgy of the Hours every day:")
+                            .font(.system(size: 16))
+                            .foregroundColor(.black)
+
+                        // Optional hours
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), alignment: .leading), count: 1), spacing: 8) {
+                            ForEach(hoursOfPrayer, id: \.self) { hour in
+                                Button(action: {
+                                    if selectedHours.contains(hour) {
+                                        selectedHours.remove(hour)
+                                    } else {
+                                        selectedHours.insert(hour)
+                                    }
+                                }) {
+                                    HStack {
+                                        Image(systemName: selectedHours.contains(hour) ? "checkmark.square.fill" : "square")
+                                            .foregroundColor(selectedHours.contains(hour) ? .blue : .gray)
+                                            .font(.system(size: 18))
+                                        Text(hour)
+                                            .font(.system(size: 15))
+                                            .foregroundColor(.black)
+                                            .multilineTextAlignment(.leading)
+                                        Spacer()
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text("(Other Commitments for Prayer):")
+                            .font(.system(size: 16))
+                            .foregroundColor(.black)
+                            .padding(.top, 10)
+
+                        TextField("e.g., Daily Rosary, Divine Mercy Chaplet", text: $prayerNotes1)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .font(.system(size: 16))
+                    }
+                }
+            }
+
+            // Sacraments Section
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Sacraments")
+                    .font(.system(size: 18))
+                    .fontWeight(.bold)
+                    .foregroundColor(.black)
+                
+                VStack(alignment: .leading, spacing: 15) {
+                    Text("I will attend Mass on these days:")
+                        .font(.system(size: 16))
+                        .foregroundColor(.black)
+                    
+                    HStack {
+                        ForEach(0..<7) { index in
+                            Button(action: {
+                                selectedMassDays[index].toggle()
+                                // Update the count
+                                massTimesPerWeek = String(selectedMassDays.filter { $0 }.count)
+                            }) {
+                                Text(["S", "M", "T", "W", "Th", "F", "S"][index])
+                                    .font(.system(size: 16))
+                                    .foregroundColor(selectedMassDays[index] ? .white : .black)
+                                    .padding(.vertical, 5)
+                                    .padding(.horizontal, 10)
+                                    .background(selectedMassDays[index] ? Color.blue : Color.white)
+                                    .cornerRadius(8)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(Color.black, lineWidth: 1)
+                                    )
+                            }
+                        }
+                    }
+                    .padding(.bottom, 10)
+
+                    HStack {
+                        Text("I will go to Confession")
+                            .font(.system(size: 16))
+                        TextField("2", text: $confessionTimesPerMonth)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 50)
+                            .keyboardType(.numberPad)
+                        Text("times a month")
+                            .font(.system(size: 16))
+                    }
+                }
+            }
+            
+            // Virtue Section
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Virtue")
+                    .font(.system(size: 18))
+                    .fontWeight(.bold)
+                    .foregroundColor(.black)
+                
+                VStack(alignment: .leading, spacing: 15) {
+                    VStack(alignment: .leading) {
+                        Text("Digital Fast:")
+                            .font(.system(size: 16))
+                        TextField("No social media after 9 PM", text: $digitalFast)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    
+                    VStack(alignment: .leading) {
+                        Text("Bodily Fast:")
+                            .font(.system(size: 16))
+                        TextField("Friday abstinence from meat", text: $bodilyFast)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    
+                    VStack(alignment: .leading) {
+                        Text("Chastity Practices:")
+                            .font(.system(size: 16))
+                        TextField("Custody of eyes, pure thoughts", text: $chastityPractices)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                }
+            }
+            
+            // Service Section
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Service")
+                    .font(.system(size: 18))
+                    .fontWeight(.bold)
+                    .foregroundColor(.black)
+                
+                VStack(alignment: .leading, spacing: 15) {
+                    VStack(alignment: .leading) {
+                        Text("Altar Server at Parish:")
+                            .font(.system(size: 16))
+                        TextField("St. Mary's", text: $altarServerParish)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    
+                    VStack(alignment: .leading) {
+                        Text("Spiritual Work of Mercy:")
+                            .font(.system(size: 16))
+                        TextField("Teach CCD", text: $spiritualWorkOfMercy)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    
+                    VStack(alignment: .leading) {
+                        Text("Corporal Work of Mercy:")
+                            .font(.system(size: 16))
+                        TextField("Food bank volunteer", text: $corporalWorkOfMercy)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                }
+            }
+            
+            // Study Section  
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Study")
+                    .font(.system(size: 18))
+                    .fontWeight(.bold)
+                    .foregroundColor(.black)
+                
+                VStack(alignment: .leading, spacing: 15) {
+                    HStack {
+                        Text("Spiritual reading:")
+                            .font(.system(size: 16))
+                        TextField("15", text: $readingMinutesPerDay)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 50)
+                            .keyboardType(.numberPad)
+                        Text("min/day,")
+                            .font(.system(size: 16))
+                        TextField("5", text: $readingDaysPerWeek)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 50)
+                            .keyboardType(.numberPad)
+                        Text("days/week")
+                            .font(.system(size: 16))
+                    }
+                }
+            }
+            
+            // Specific Discernment Actions
+            VStack(alignment: .leading, spacing: 10) {
+                Text("Specific Discernment Actions")
+                    .font(.system(size: 18))
+                    .fontWeight(.bold)
+                    .foregroundColor(.black)
+                
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Dating Fast (180 days):")
+                        .font(.system(size: 16))
+                        .fontWeight(.medium)
+                    
+                    Text("✓ Relate to women as a priest would")
+                        .font(.system(size: 15))
+                        .foregroundColor(.blue)
+                    
+                    Text("✓ Dismiss romantic interests")
+                        .font(.system(size: 15))
+                        .foregroundColor(.blue)
+                    
+                    Text("✓ Avoid one-on-one settings with women")
+                        .font(.system(size: 15))
+                        .foregroundColor(.blue)
+                }
+                
+                VStack(alignment: .leading, spacing: 15) {
+                    VStack(alignment: .leading) {
+                        Text("Spiritual Director:")
+                            .font(.system(size: 16))
+                        TextField("Fr. Smith", text: $spiritualDirectorName)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    
+                    VStack(alignment: .leading) {
+                        Text("Seminary to Visit:")
+                            .font(.system(size: 16))
+                        TextField("St. John's Seminary", text: $seminaryName)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                        TextField("Visit Date", text: $seminaryVisitDate)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                    
+                    VStack(alignment: .leading) {
+                        Text("Discernment Retreat:")
+                            .font(.system(size: 16))
+                        TextField("Come and See Retreat", text: $retreatName)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                        TextField("Retreat Date", text: $retreatDate)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                    }
+                }
+            }
+            
+            // Save Button
+            Button(action: {
+                guard !isSaving else { return }
+                saveRuleOfLife()
+            }) {
+                HStack {
+                    if isSaving {
+                        ProgressView()
+                            .scaleEffect(0.8)
+                            .foregroundColor(.white)
+                    }
+                    Text(isSaving ? "Saving..." : "Save Rule of Life")
+                        .font(.system(size: 18))
+                        .fontWeight(.bold)
+                        .foregroundColor(.white)
+                }
+                .frame(maxWidth: .infinity)
+                .frame(height: 56)
+                .background(isSaving ? Color.gray : Color.blue)
+                .cornerRadius(10)
+            }
+            .disabled(isSaving)
+            .padding(.top, 20)
+        }
+        .padding(.horizontal, 16)
+        .onAppear {
+            Task {
+                await loadExistingRule()
+            }
+        }
+        .alert("Success", isPresented: $showingSaveConfirmation) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text("Your Rule of Life has been saved successfully.")
+        }
+        .alert("Error", isPresented: $showingErrorAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(errorMessage)
+        }
+    }
+    
+    private func loadExistingRule() async {
+        guard !authViewModel.userId.isEmpty else { return }
+        
+        isLoading = true
+        do {
+            let response = try await SupabaseManager.shared.client
+                .from("rule_of_life")
+                .select("*")
+                .eq("user_id", value: authViewModel.userId)
+                .execute()
+            
+            if let dataArray = try JSONSerialization.jsonObject(with: response.data) as? [[String: Any]],
+               let ruleData = dataArray.first {
+                await MainActor.run {
+                    // Prayer
+                    prayerMinutes = ruleData["prayer_minutes"] as? String ?? ""
+                    prayerTimeFrom = ruleData["prayer_time_from"] as? String ?? ""
+                    prayerTimeTo = ruleData["prayer_time_to"] as? String ?? ""
+                    wakeUpTime = ruleData["wake_up_time"] as? String ?? ""
+                    bedTime = ruleData["bed_time"] as? String ?? ""
+                    
+                    // Load additional hours and convert to Set (excluding Night Prayer which is mandatory)
+                    let hoursString = ruleData["additional_hours"] as? String ?? ""
+                    if !hoursString.isEmpty {
+                        var hours = Set(hoursString.components(separatedBy: ", "))
+                        hours.remove("Night Prayer") // Remove Night Prayer from selectable options
+                        selectedHours = hours
+                    } else {
+                        selectedHours = Set<String>()
+                    }
+                    additionalHours = hoursString
+                    
+                    // Sacraments
+                    let massDaysString = ruleData["mass_times_per_week"] as? String ?? ""
+                    if !massDaysString.isEmpty {
+                        let dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+                        let selectedDayNames = massDaysString.components(separatedBy: ", ")
+                        selectedMassDays = [Bool](repeating: false, count: 7)
+                        for (index, dayName) in dayNames.enumerated() {
+                            if selectedDayNames.contains(dayName) {
+                                selectedMassDays[index] = true
+                            }
+                        }
+                        massTimesPerWeek = String(selectedMassDays.filter { $0 }.count)
+                    } else {
+                        selectedMassDays = [Bool](repeating: false, count: 7)
+                        massTimesPerWeek = ""
+                    }
+                    additionalMassDays = ruleData["additional_mass_days"] as? String ?? ""
+                    confessionTimesPerMonth = ruleData["confession_times_per_month"] as? String ?? ""
+                    
+                    // Virtue
+                    digitalFast = ruleData["digital_fast"] as? String ?? ""
+                    bodilyFast = ruleData["bodily_fast"] as? String ?? ""
+                    chastityPractices = ruleData["chastity_practices"] as? String ?? ""
+                    
+                    // Service
+                    altarServerParish = ruleData["altar_server_parish"] as? String ?? ""
+                    spiritualWorkOfMercy = ruleData["spiritual_work_of_mercy"] as? String ?? ""
+                    corporalWorkOfMercy = ruleData["corporal_work_of_mercy"] as? String ?? ""
+                    
+                    // Study
+                    readingMinutesPerDay = ruleData["reading_minutes_per_day"] as? String ?? ""
+                    readingDaysPerWeek = ruleData["reading_days_per_week"] as? String ?? ""
+                    
+                    // Specific Discernment
+                    spiritualDirectorName = ruleData["spiritual_director_name"] as? String ?? ""
+                    seminaryName = ruleData["seminary_name"] as? String ?? ""
+                    seminaryVisitDate = ruleData["seminary_visit_date"] as? String ?? ""
+                    retreatName = ruleData["retreat_name"] as? String ?? ""
+                    retreatDate = ruleData["retreat_date"] as? String ?? ""
+                    
+                    isLoading = false
+                }
+            } else {
+                await MainActor.run {
+                    isLoading = false
+                }
+            }
+        } catch {
+            print("Error loading rule of life: \(error)")
+            await MainActor.run {
+                isLoading = false
+            }
+        }
+    }
+    
+    // Create a Codable struct for the data
+    struct RuleOfLifeData: Codable {
+        let user_id: String
+        let prayer_minutes: String
+        let prayer_time_from: String
+        let prayer_time_to: String
+        let wake_up_time: String
+        let bed_time: String
+        let additional_hours: String
+        let prayer_notes1: String
+        let prayer_notes2: String
+        let mass_times_per_week: String
+        let additional_mass_days: String
+        let confession_times_per_month: String
+        let sacraments_notes1: String
+        let sacraments_notes2: String
+        let digital_fast: String
+        let bodily_fast: String
+        let chastity_practices: String
+        let virtue_notes1: String
+        let virtue_notes2: String
+        let altar_server_parish: String
+        let spiritual_work_of_mercy: String
+        let corporal_work_of_mercy: String
+        let service_notes1: String
+        let service_notes2: String
+        let reading_minutes_per_day: String
+        let reading_days_per_week: String
+        let study_notes1: String
+        let study_notes2: String
+        let dating_fast_commitment: Bool
+        let dismiss_romantic_interests: Bool
+        let avoid_one_on_one: Bool
+        let spiritual_director_name: String
+        let seminary_name: String
+        let seminary_visit_date: String
+        let retreat_name: String
+        let retreat_date: String
+    }
+    
+    private func saveRuleOfLife() {
+        guard !authViewModel.userId.isEmpty else {
+            errorMessage = "User not authenticated"
+            showingErrorAlert = true
+            return
+        }
+        
+        isSaving = true
+        
+        Task {
+            do {
+                // Convert boolean array to day names
+                let dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+                var selectedDayNames: [String] = []
+                for (index, isSelected) in selectedMassDays.enumerated() {
+                    if isSelected {
+                        selectedDayNames.append(dayNames[index])
+                    }
+                }
+                
+                let ruleData = RuleOfLifeData(
+                    user_id: authViewModel.userId,
+                    prayer_minutes: prayerMinutes,
+                    prayer_time_from: prayerTimeFrom,
+                    prayer_time_to: prayerTimeTo,
+                    wake_up_time: wakeUpTime,
+                    bed_time: bedTime,
+                    additional_hours: "Night Prayer, " + Array(selectedHours).joined(separator: ", "),
+                    prayer_notes1: prayerNotes1,
+                    prayer_notes2: prayerNotes2,
+                    mass_times_per_week: selectedDayNames.joined(separator: ", "),
+                    additional_mass_days: additionalMassDays,
+                    confession_times_per_month: confessionTimesPerMonth,
+                    sacraments_notes1: sacramentsNotes1,
+                    sacraments_notes2: sacramentsNotes2,
+                    digital_fast: digitalFast,
+                    bodily_fast: bodilyFast,
+                    chastity_practices: chastityPractices,
+                    virtue_notes1: virtueNotes1,
+                    virtue_notes2: virtueNotes2,
+                    altar_server_parish: altarServerParish,
+                    spiritual_work_of_mercy: spiritualWorkOfMercy,
+                    corporal_work_of_mercy: corporalWorkOfMercy,
+                    service_notes1: serviceNotes1,
+                    service_notes2: serviceNotes2,
+                    reading_minutes_per_day: readingMinutesPerDay,
+                    reading_days_per_week: readingDaysPerWeek,
+                    study_notes1: studyNotes1,
+                    study_notes2: studyNotes2,
+                    dating_fast_commitment: true,
+                    dismiss_romantic_interests: true,
+                    avoid_one_on_one: true,
+                    spiritual_director_name: spiritualDirectorName,
+                    seminary_name: seminaryName,
+                    seminary_visit_date: seminaryVisitDate,
+                    retreat_name: retreatName,
+                    retreat_date: retreatDate
+                )
+                
+                // Check if user already has a rule of life
+                let checkResponse = try await SupabaseManager.shared.client
+                    .from("rule_of_life")
+                    .select("user_id")
+                    .eq("user_id", value: authViewModel.userId)
+                    .execute()
+                
+                if let dataArray = try JSONSerialization.jsonObject(with: checkResponse.data) as? [[String: Any]],
+                   !dataArray.isEmpty {
+                    // Update existing record
+                    _ = try await SupabaseManager.shared.client
+                        .from("rule_of_life")
+                        .update(ruleData)
+                        .eq("user_id", value: authViewModel.userId)
+                        .execute()
+                } else {
+                    // Insert new record
+                    _ = try await SupabaseManager.shared.client
+                        .from("rule_of_life")
+                        .insert(ruleData)
+                        .execute()
+                }
+                
+                await MainActor.run {
+                    isSaving = false
+                    showingSaveConfirmation = true
+                }
+                
+            } catch {
+                print("Error saving rule of life: \(error)")
+                await MainActor.run {
+                    isSaving = false
+                    errorMessage = "Failed to save rule of life. Please try again."
+                    showingErrorAlert = true
+                }
+            }
+        }
+    }
 }
 
 struct WeekReviewView_Previews: PreviewProvider {

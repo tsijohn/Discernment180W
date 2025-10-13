@@ -22,7 +22,7 @@ struct SignUpPageView: View {
     var body: some View {
         NavigationView {
             ZStack {
-                // Background Color
+                // Background Colorg
                 Color(hex: "#132A47").ignoresSafeArea()
 
                 VStack(spacing: 4) {
