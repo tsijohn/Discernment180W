@@ -7,11 +7,19 @@ struct D180excursusmens: Codable, Identifiable {
     let reading: String
     let title: String
     let Complete: String?
-    
+    let curriculum_order: Int?  // Add curriculum_order field
+
     // Computed property to handle null values
     var isComplete: Bool {
         return Complete?.lowercased() == "yes"
     }
+}
+
+// Structure for d180mens table data
+struct D180mensRecord: Codable {
+    let day: Int
+    let day_text: String
+    let curriculum_order: Int
 }
 
 // MARK: - Table of Contents View
@@ -80,8 +88,15 @@ struct ExcursusView: View {
                     // Excursus List
                     List {
                         ForEach(excursusReadings.sorted(by: { $0.week < $1.week })) { excursus in
-                            NavigationLink(destination: ExcursusDetailView(excursus: excursus).environmentObject(authViewModel)) {
-                                ExcursusRowView(excursus: excursus, accentColor: accentColor)
+                            NavigationLink(destination:
+                                DailyReadingView(
+                                    day: excursus.curriculum_order != nil ? String(excursus.curriculum_order!) : nil,
+                                    isFromNavigation: false  // Use false to indicate curriculum_order based navigation
+                                )
+                                .environmentObject(authViewModel)
+                                .environmentObject(AppState())
+                            ) {
+                                ExcursusRowView(excursus: excursus, completedDays: completedDays, accentColor: accentColor)
                             }
                             .listRowSeparator(.hidden)
                             .listRowBackground(Color.clear)
@@ -294,8 +309,15 @@ struct ProgressIndicator: View {
 // MARK: - Row View for Table of Contents
 struct ExcursusRowView: View {
     let excursus: D180excursusmens
+    let completedDays: [Int]
     let accentColor: Color
-    
+    @State private var excursusDay: Int? = nil
+
+    var isCompleted: Bool {
+        guard let day = excursusDay else { return false }
+        return completedDays.contains(day)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -304,7 +326,7 @@ struct ExcursusRowView: View {
                         .font(.caption)
                         .foregroundColor(.secondary)
                         .fontWeight(.medium)
-                    
+
                     Text(excursus.title)
                         .font(.headline)
                         .fontWeight(.semibold)
@@ -312,11 +334,11 @@ struct ExcursusRowView: View {
                         .lineLimit(2)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                
+
                 Spacer()
-                
+
                 VStack {
-                    if excursus.isComplete {
+                    if isCompleted {
                         Image(systemName: "checkmark.circle.fill")
                             .foregroundColor(accentColor)
                             .font(.title2)
@@ -325,10 +347,10 @@ struct ExcursusRowView: View {
                             .foregroundColor(.secondary)
                             .font(.title2)
                     }
-                    
-                    Text(excursus.isComplete ? "Complete" : "Incomplete")
+
+                    Text(isCompleted ? "Complete" : "Incomplete")
                         .font(.caption2)
-                        .foregroundColor(excursus.isComplete ? accentColor : .secondary)
+                        .foregroundColor(isCompleted ? accentColor : .secondary)
                         .fontWeight(.medium)
                 }
             }
@@ -340,148 +362,41 @@ struct ExcursusRowView: View {
                 .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 1)
         )
         .overlay(
-            excursus.isComplete ?
+            isCompleted ?
             RoundedRectangle(cornerRadius: 12)
                 .stroke(accentColor, lineWidth: 1.5)
             : nil
         )
         .padding(.horizontal)
         .padding(.vertical, 4)
+        .task {
+            // Fetch the day value for this excursus
+            if let curriculumOrder = excursus.curriculum_order {
+                await fetchExcursusDay(curriculumOrder: curriculumOrder)
+            }
+        }
     }
-}
 
-// MARK: - Detail View for Individual Excursus
-struct ExcursusDetailView: View {
-    @Environment(\.dismiss) var dismiss
-    @EnvironmentObject var authViewModel: AuthViewModel  // Add this to access logged-in user
-    @State var excursus: D180excursusmens
-    @State private var isReadingComplete = false
-    
-    private let accentColor = Color.blue
-    private let backgroundColor = Color(.systemBackground)
-    
-    var body: some View {
-        ZStack {
-            backgroundColor.edgesIgnoringSafeArea(.all)
-            
-            ScrollView {
-                VStack(spacing: 16) {
-                    ExcursusDetailCard(
-                        excursus: excursus,
-                        isComplete: $isReadingComplete,
-                        accentColor: accentColor,
-                        onCompletionChange: { newValue in
-                            Task {
-                                await updateCompletionStatus(isComplete: newValue)
-                            }
-                        }
-                    )
-                }
-                .padding(.horizontal)
-                .padding(.bottom, 16)
-            }
-        }
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .principal) {
-                VStack(spacing: 2) {
-                    Text("Week \(excursus.week)")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text("Excursus")
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                }
-            }
-        }
-        .onAppear {
-            isReadingComplete = excursus.isComplete
-        }
-    }
-    
-    func updateCompletionStatus(isComplete: Bool) async {
-        let newStatus = isComplete ? "Yes" : "No"
-        
+    func fetchExcursusDay(curriculumOrder: Int) async {
         do {
-            try await SupabaseManager.shared.client
-                .from("d180excursusmens")
-                .update(["Complete": newStatus])
-                .eq("id", value: excursus.id)
+            let records: [D180mensRecord] = try await SupabaseManager.shared.client
+                .from("d180mens")
+                .select("day, day_text, curriculum_order")
+                .eq("curriculum_order", value: curriculumOrder)
                 .execute()
-            
-            // Update local state
-            excursus = D180excursusmens(
-                id: excursus.id,
-                week: excursus.week,
-                reading: excursus.reading,
-                title: excursus.title,
-                Complete: newStatus
-            )
-            
-            print("Completion status updated to \(newStatus)")
+                .value
+
+            if let record = records.first {
+                await MainActor.run {
+                    self.excursusDay = record.day
+                }
+            }
         } catch {
-            print("Error updating completion status: \(error)")
+            print("Error fetching excursus day: \(error)")
         }
     }
 }
 
-// MARK: - Detail Card Component
-struct ExcursusDetailCard: View {
-    let excursus: D180excursusmens
-    @Binding var isComplete: Bool
-    let accentColor: Color
-    let onCompletionChange: (Bool) -> Void
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Week \(excursus.week)")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                    .fontWeight(.medium)
-                
-                Text(excursus.title)
-                    .font(.title2)
-                    .fontWeight(.bold)
-                    .foregroundColor(.primary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            
-            Divider()
-            
-            Text(excursus.reading.htmlToAttributedString())
-                .lineSpacing(6)
-                .tint(accentColor)
-                .fixedSize(horizontal: false, vertical: true)
-            
-            HStack {
-                Text("Mark as Complete")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                Spacer()
-                Toggle("", isOn: $isComplete)
-                    .toggleStyle(SwitchToggleStyle(tint: accentColor))
-                    .onChange(of: isComplete) { newValue in
-                        onCompletionChange(newValue)
-                    }
-            }
-            .padding(.top, 8)
-        }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(.secondarySystemBackground))
-                .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
-        )
-        .overlay(
-            isComplete ?
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(accentColor, lineWidth: 2)
-            : nil
-        )
-        .animation(.easeInOut(duration: 0.2), value: isComplete)
-    }
-}
 
 struct ExcursusView_Previews: PreviewProvider {
     static var previews: some View {

@@ -175,19 +175,19 @@ struct NavigationHubView: View {
                                             .font(.subheadline)
                                             .fontWeight(.semibold)
                                             .foregroundColor(Color(hexString: "#19223b"))
-                                        
+
                                         Text("Explore supplementary materials and deeper spiritual insights")
                                             .font(.caption)
                                             .foregroundColor(.secondary)
                                             .multilineTextAlignment(.leading)
                                     }
-                                    
+
                                     Spacer()
-                                    
+
                                     Image(systemName: "book.closed")
                                         .font(.system(size: 18))
                                         .foregroundColor(Color(hexString: "#19223b"))
-                                    
+
                                     Image(systemName: "chevron.right")
                                         .font(.system(size: 12))
                                         .foregroundColor(.secondary)
@@ -431,6 +431,7 @@ struct NavigationHubView: View {
         }
     }
     
+
     // Fetch the current day and completed days from Supabase
     func fetchCurrentDay() async {
         guard !authViewModel.userEmail.isEmpty else {
