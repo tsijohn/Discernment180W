@@ -12,6 +12,7 @@ struct HomePageView: View {
     @State private var hasJustUpdatedCurriculum: Bool = false
     @State private var isNavigatingToWeeklyReview: Bool = false
     @State private var completedDays: [Int]? = nil
+    @State private var homepageExcerptText: String? = nil // Dynamic excerpt from database
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var authViewModel: AuthViewModel
 
@@ -241,7 +242,7 @@ struct HomePageView: View {
                 .select("completed_days")
                 .eq("email", value: authViewModel.userEmail)
                 .execute()
-            
+
             if let dataArray = try? JSONSerialization.jsonObject(with: response.data) as? [[String: Any]],
                let userData = dataArray.first {
                 await MainActor.run {
@@ -252,7 +253,24 @@ struct HomePageView: View {
             print("Error fetching completed days: \(error)")
         }
     }
-    
+
+    // Function to fetch homepage excerpt from database
+    private func fetchHomepageExcerpt() async {
+        // Get the current day as an integer
+        let currentDay = Int(appState.currentDayText) ?? 1
+
+        // Try to fetch excerpt from database
+        if let excerptText = try? await SupabaseManager.shared.fetchHomepageExcerpt(forDay: currentDay) {
+            await MainActor.run {
+                self.homepageExcerptText = excerptText
+            }
+            print("✅ Fetched homepage excerpt for day \(currentDay)")
+        } else {
+            print("📖 No excerpt found for day \(currentDay), using default Romans 12:2")
+            // homepageExcerptText remains nil, so the default Romans 12:2 will be shown
+        }
+    }
+
     // Function to fetch content based on curriculum_order
     func fetchContentFromCurriculumOrder() async {
         // Check if we should show Day 0 first
@@ -530,37 +548,67 @@ struct HomePageView: View {
                                 .padding(.horizontal, 20)
                                 .padding(.vertical, 30)
                                 
-                                // Enhanced Bible quote card
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: 15)
-                                        .fill(Color.white)
-                                        .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 3)
-                                    
-                                    RoundedRectangle(cornerRadius: 15)
-                                        .stroke(goldGradient.opacity(0.3), lineWidth: 1)
-                                    
-                                    VStack(spacing: 10) {
-                                        Image(systemName: "book.fill")
-                                            .font(.system(size: 30))
-                                            .foregroundColor(Color(hexString: "#DAA520"))
-                                            .padding(.bottom, 5)
-                                        
-                                        Text("Romans 12:2")
-                                            .font(.system(size: 20))
-                                            .fontWeight(.bold)
-                                            .foregroundColor(Color(hexString: "#132A47"))
-                                        
-                                        Text("\"Be transformed by the renewal of your mind, so you may discern what is good, pleasing, and perfect: the will of God.\"")
-                                            .font(.system(size: 18))
-                                            .fontWeight(.regular)
-                                            .foregroundColor(Color(hexString: "#132A47").opacity(0.9))
-                                            .multilineTextAlignment(.center)
-                                            .padding(.horizontal, 20)
+                                // Enhanced Bible quote card - now with dynamic content
+                                if let excerptText = homepageExcerptText {
+                                    // Show dynamic content from database
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 15)
+                                            .fill(Color.white)
+                                            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 3)
+
+                                        RoundedRectangle(cornerRadius: 15)
+                                            .stroke(goldGradient.opacity(0.3), lineWidth: 1)
+
+                                        VStack(spacing: 10) {
+                                            Image(systemName: "book.fill")
+                                                .font(.system(size: 30))
+                                                .foregroundColor(Color(hexString: "#DAA520"))
+                                                .padding(.bottom, 5)
+
+                                            Text(excerptText)
+                                                .font(.system(size: 18))
+                                                .fontWeight(.regular)
+                                                .foregroundColor(Color(hexString: "#132A47").opacity(0.9))
+                                                .multilineTextAlignment(.center)
+                                                .padding(.horizontal, 20)
+                                        }
+                                        .padding(.vertical, 20)
                                     }
-                                    .padding(.vertical, 20)
+                                    .padding(.horizontal, 20)
+                                    .padding(.bottom, 20)
+                                } else {
+                                    // Show default Romans 12:2 verse as fallback
+                                    ZStack {
+                                        RoundedRectangle(cornerRadius: 15)
+                                            .fill(Color.white)
+                                            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 3)
+
+                                        RoundedRectangle(cornerRadius: 15)
+                                            .stroke(goldGradient.opacity(0.3), lineWidth: 1)
+
+                                        VStack(spacing: 10) {
+                                            Image(systemName: "book.fill")
+                                                .font(.system(size: 30))
+                                                .foregroundColor(Color(hexString: "#DAA520"))
+                                                .padding(.bottom, 5)
+
+                                            Text("Romans 12:2")
+                                                .font(.system(size: 20))
+                                                .fontWeight(.bold)
+                                                .foregroundColor(Color(hexString: "#132A47"))
+
+                                            Text("\"Be transformed by the renewal of your mind, so you may discern what is good, pleasing, and perfect: the will of God.\"")
+                                                .font(.system(size: 18))
+                                                .fontWeight(.regular)
+                                                .foregroundColor(Color(hexString: "#132A47").opacity(0.9))
+                                                .multilineTextAlignment(.center)
+                                                .padding(.horizontal, 20)
+                                        }
+                                        .padding(.vertical, 20)
+                                    }
+                                    .padding(.horizontal, 20)
+                                    .padding(.bottom, 20)
                                 }
-                                .padding(.horizontal, 20)
-                                .padding(.bottom, 20)
                             }
                             
                             Spacer(minLength: 20)
@@ -587,7 +635,7 @@ struct HomePageView: View {
                         let email = authViewModel.userEmail
                         print("🏠 HomePageView main onAppear")
                         print("   - curriculumOrder: '\(appState.curriculumOrder)'")
-                        
+
                         // Only fetch from database if curriculumOrder is completely empty (first load)
                         if appState.curriculumOrder.isEmpty {
                             print("   📊 Initial load - fetching from database")
@@ -596,6 +644,9 @@ struct HomePageView: View {
                         } else {
                             print("   ✅ Already have curriculumOrder: \(appState.curriculumOrder)")
                         }
+
+                        // Fetch homepage excerpt based on current day
+                        await fetchHomepageExcerpt()
                     }
                 }
             }

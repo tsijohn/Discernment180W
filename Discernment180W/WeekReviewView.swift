@@ -6,6 +6,7 @@ import Combine
 struct WeekReviewView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var viewContext
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var authViewModel: AuthViewModel
     @State var weekNumber: Int
     @State private var showingWeekPicker = false
@@ -174,14 +175,14 @@ struct WeekReviewView: View {
                         Text("Progress")
                             .font(.system(size: 15))
                             .fontWeight(.semibold)
-                            .foregroundColor(.primary)
+                            .foregroundColor(.black)
                         
                         Spacer()
                         
                         Text("\(weekNumber) of \(totalWeeks) weeks")
                             .font(.system(size: 15))
                             .fontWeight(.medium)
-                            .foregroundColor(.primary)
+                            .foregroundColor(.black)
                     }
                     
                     HStack(alignment: .center, spacing: 8) {
@@ -223,7 +224,7 @@ struct WeekReviewView: View {
                         Text("My Rule")
                             .font(.system(size: 15))
                             .fontWeight(.medium)
-                            .foregroundColor(.primary)
+                            .foregroundColor(.black)
                             .lineLimit(1)
                         
                         Spacer()
@@ -273,7 +274,7 @@ struct WeekReviewView: View {
                 Text("Week \(weekNumber) Review")
                     .font(.system(size: 16))
                     .fontWeight(.semibold)
-                    .foregroundColor(.primary)
+                    .foregroundColor(.black)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)
                 
@@ -286,7 +287,7 @@ struct WeekReviewView: View {
                     HStack {
                         Text("Navigate to Week")
                             .font(.system(size: 15))
-                            .foregroundColor(.primary)
+                            .foregroundColor(.black)
                         
                         Spacer()
                         
@@ -377,7 +378,7 @@ struct WeekReviewView: View {
                             Text("Planning Ahead")
                                 .font(.system(size: 15))
                                 .fontWeight(.medium)
-                                .foregroundColor(.primary)
+                                .foregroundColor(.black)
                                 .lineLimit(1)
                             
                             Spacer()
@@ -632,12 +633,12 @@ struct WeekReviewView: View {
                                     if isSkipping {
                                         ProgressView()
                                             .scaleEffect(0.8)
-                                            .foregroundColor(.primary)
+                                            .foregroundColor(.black)
                                     }
                                     Text(isSkipping ? "Skipping..." : "Skip")
                                         .font(.system(size: 18))
                                         .fontWeight(.bold)
-                                        .foregroundColor(.primary)
+                                        .foregroundColor(.black)
                                 }
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 56)
@@ -684,13 +685,14 @@ struct WeekReviewView: View {
                         .scaleEffect(1.5)
                         .progressViewStyle(CircularProgressViewStyle(tint: .blue))
                         .frame(width: 50, height: 50)
-                        .background(Color.white.opacity(0.8))
+                        .background(Color(.systemBackground).opacity(0.8))
                         .cornerRadius(10)
                 }
             }
         }
         .navigationBarHidden(true)
         .ignoresSafeArea(.keyboard, edges: .bottom)
+        .preferredColorScheme(.light) // Force light mode for this entire view
         .onAppear {
             selectedWeek = weekNumber
             Task {
@@ -1457,22 +1459,26 @@ struct RuleOfLifeEmbeddedView: View {
                     HStack {
                         Text("I will pray for")
                             .font(.system(size: 16))
+                            .foregroundColor(.black)
                         TextField("60", text: $prayerMinutes)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .frame(width: 60)
                             .keyboardType(.numberPad)
                         Text("minutes every day")
                             .font(.system(size: 16))
+                            .foregroundColor(.black)
                     }
-                    
+
                     HStack {
                         Text("My prayer time will be from")
                             .font(.system(size: 16))
+                            .foregroundColor(.black)
                         TextField("6:00 AM", text: $prayerTimeFrom)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .frame(width: 80)
                         Text("to")
                             .font(.system(size: 16))
+                            .foregroundColor(.black)
                         TextField("7:00 AM", text: $prayerTimeTo)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .frame(width: 80)
@@ -1481,6 +1487,7 @@ struct RuleOfLifeEmbeddedView: View {
                     HStack {
                         Text("I will wake up at")
                             .font(.system(size: 16))
+                            .foregroundColor(.black)
                         TextField("5:30 AM", text: $wakeUpTime)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .frame(width: 80)
@@ -1490,6 +1497,7 @@ struct RuleOfLifeEmbeddedView: View {
                     HStack {
                         Text("My bedtime will be")
                             .font(.system(size: 16))
+                            .foregroundColor(.black)
                         TextField("10:30 PM", text: $bedTime)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .frame(width: 80)
@@ -1581,14 +1589,14 @@ struct RuleOfLifeEmbeddedView: View {
                             }) {
                                 Text(["S", "M", "T", "W", "Th", "F", "S"][index])
                                     .font(.system(size: 16))
-                                    .foregroundColor(selectedMassDays[index] ? .white : .black)
+                                    .foregroundColor(selectedMassDays[index] ? .white : .primary)
                                     .padding(.vertical, 5)
                                     .padding(.horizontal, 10)
-                                    .background(selectedMassDays[index] ? Color.blue : Color.white)
+                                    .background(selectedMassDays[index] ? Color.blue : Color(.systemGray6))
                                     .cornerRadius(8)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.black, lineWidth: 1)
+                                            .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
                                     )
                             }
                         }
@@ -1708,18 +1716,40 @@ struct RuleOfLifeEmbeddedView: View {
                     Text("Dating Fast (180 days):")
                         .font(.system(size: 16))
                         .fontWeight(.medium)
-                    
-                    Text("✓ Relate to women as a priest would")
-                        .font(.system(size: 15))
-                        .foregroundColor(.blue)
-                    
-                    Text("✓ Dismiss romantic interests")
-                        .font(.system(size: 15))
-                        .foregroundColor(.blue)
-                    
-                    Text("✓ Avoid one-on-one settings with women")
-                        .font(.system(size: 15))
-                        .foregroundColor(.blue)
+                        .foregroundColor(.black)
+
+                    // First checkbox - matching Night Prayer style
+                    HStack {
+                        Image(systemName: "checkmark.square.fill")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                        Text("Relate to women as a priest would")
+                            .font(.system(size: 16))
+                            .foregroundColor(.black)
+                        Spacer()
+                    }
+
+                    // Second checkbox - matching Night Prayer style
+                    HStack {
+                        Image(systemName: "checkmark.square.fill")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                        Text("Dismiss romantic interests")
+                            .font(.system(size: 16))
+                            .foregroundColor(.black)
+                        Spacer()
+                    }
+
+                    // Third checkbox - matching Night Prayer style
+                    HStack {
+                        Image(systemName: "checkmark.square.fill")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                        Text("Avoid one-on-one settings with women")
+                            .font(.system(size: 16))
+                            .foregroundColor(.black)
+                        Spacer()
+                    }
                 }
                 
                 VStack(alignment: .leading, spacing: 15) {

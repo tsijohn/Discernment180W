@@ -14,6 +14,13 @@ struct UserSignUpData: Encodable {
     let created_at: String
 }
 
+// Homepage excerpt data structure
+struct HomepageExcerpt: Decodable {
+    let page_text: String
+    let start_day: Int
+    let end_day: Int
+}
+
 class SupabaseManager {
     static let shared = SupabaseManager()
     let client: SupabaseClient
@@ -249,6 +256,28 @@ class SupabaseManager {
 // MARK: - Extension for specific table operations
 
 extension SupabaseManager {
+    // Fetch homepage excerpt based on current day
+    func fetchHomepageExcerpt(forDay currentDay: Int) async throws -> String? {
+        do {
+            let response = try await client
+                .from("homepage_excerpts")
+                .select("*")
+                .lte("start_day", value: currentDay)  // start_day <= currentDay
+                .gte("end_day", value: currentDay)    // end_day >= currentDay
+                .single()
+                .execute()
+
+            let decoder = JSONDecoder()
+            let excerpt = try decoder.decode(HomepageExcerpt.self, from: response.data)
+            return excerpt.page_text
+
+        } catch {
+            print("Error fetching homepage excerpt: \(error)")
+            // Return default Romans 12:2 verse if no excerpt found or error occurs
+            return nil
+        }
+    }
+
     // Fetch D180 content by curriculum order
     func fetchD180Content(curriculumOrder: Int) async throws -> [[String: Any]] {
         let response = try await client

@@ -192,11 +192,12 @@ struct UserProfileView: View {
         }
         .sheet(isPresented: $showingFeedbackForm) {
             NavigationView {
-                VStack(alignment: .leading, spacing: 20) {
-                    Text("We'd love to hear from you!")
-                        .font(.system(size: 20))
-                        .fontWeight(.bold)
-                        .padding(.top)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 20) {
+                        Text("We'd love to hear from you!")
+                            .font(.system(size: 20))
+                            .fontWeight(.bold)
+                            .padding(.top)
                     
                     // Feedback Type Picker
                     VStack(alignment: .leading, spacing: 8) {
@@ -219,7 +220,7 @@ struct UserProfileView: View {
                         Text("Your Feedback")
                             .font(.system(size: 14))
                             .foregroundColor(.gray)
-                        
+
                         TextEditor(text: $feedbackText)
                             .font(.system(size: 16))
                             .padding(8)
@@ -228,6 +229,18 @@ struct UserProfileView: View {
                                     .stroke(Color.gray.opacity(0.3), lineWidth: 1)
                             )
                             .frame(minHeight: 150)
+                            .toolbar {
+                                ToolbarItemGroup(placement: .keyboard) {
+                                    Spacer()
+                                    Button(action: {
+                                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                                    }) {
+                                        Text("Done")
+                                            .foregroundColor(.blue)
+                                            .fontWeight(.medium)
+                                    }
+                                }
+                            }
                     }
                     
                     Spacer()
@@ -253,8 +266,14 @@ struct UserProfileView: View {
                         .cornerRadius(10)
                     }
                     .disabled(feedbackText.isEmpty || isSubmittingFeedback)
+                    }
+                    .padding()
                 }
-                .padding()
+                .background(Color(.systemBackground))
+                .onTapGesture {
+                    // Dismiss keyboard when tapping outside
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                }
                 .navigationTitle("Feedback")
                 .navigationBarTitleDisplayMode(.inline)
                 .navigationBarItems(

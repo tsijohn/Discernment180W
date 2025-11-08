@@ -26,7 +26,7 @@ extension WeekReviewView {
                                 .foregroundColor(massDays[index] ? .white : .black)
                                 .padding(.vertical, 5)
                                 .padding(.horizontal, 10)
-                                .background(massDays[index] ? Color.blue : Color.white)
+                                .background(massDays[index] ? Color.blue : Color(.systemGray6))
                                 .cornerRadius(8)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 8)

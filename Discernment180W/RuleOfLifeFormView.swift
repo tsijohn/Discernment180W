@@ -3,6 +3,7 @@ import Supabase
 
 struct RuleOfLifeFormView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     @EnvironmentObject var authViewModel: AuthViewModel
     
     // Create a Codable struct for the data
@@ -140,7 +141,7 @@ struct RuleOfLifeFormView: View {
                 Text("Rule of Life")
                     .font(.system(size: 18))
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                 
                 Spacer()
                 
@@ -248,7 +249,7 @@ struct RuleOfLifeFormView: View {
             Text("Prayer")
                 .font(.system(size: 18))
                 .fontWeight(.bold)
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
                 .padding(.leading, 16)
             
             VStack(alignment: .leading, spacing: 15) {
@@ -256,12 +257,14 @@ struct RuleOfLifeFormView: View {
                 HStack {
                     Text("I will pray for")
                         .font(.system(size: 16))
+                        .foregroundColor(.primary)
                     TextField("60", text: $prayerMinutes)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 60)
                         .keyboardType(.numberPad)
                     Text("minutes every day")
                         .font(.system(size: 16))
+                        .foregroundColor(.primary)
                 }
                 .padding(.horizontal, 16)
                 
@@ -269,11 +272,13 @@ struct RuleOfLifeFormView: View {
                 HStack {
                     Text("My prayer time will be from")
                         .font(.system(size: 16))
+                        .foregroundColor(.primary)
                     TextField("6:00 AM", text: $prayerTimeFrom)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 80)
                     Text("to")
                         .font(.system(size: 16))
+                        .foregroundColor(.primary)
                     TextField("7:00 AM", text: $prayerTimeTo)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 80)
@@ -284,6 +289,7 @@ struct RuleOfLifeFormView: View {
                 HStack {
                     Text("I will wake up at")
                         .font(.system(size: 16))
+                        .foregroundColor(.primary)
                     TextField("5:30 AM", text: $wakeUpTime)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 80)
@@ -295,6 +301,7 @@ struct RuleOfLifeFormView: View {
                 HStack {
                     Text("My bedtime will be")
                         .font(.system(size: 16))
+                        .foregroundColor(.primary)
                     TextField("10:30 PM", text: $bedTime)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 80)
@@ -318,7 +325,7 @@ struct RuleOfLifeFormView: View {
                         .font(.system(size: 18))
                     Text("I will pray Night Prayer every night.")
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                     Spacer()
                 }
                 .padding(.horizontal, 16)
@@ -327,7 +334,7 @@ struct RuleOfLifeFormView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I will also pray these hours from the Liturgy of the Hours every day:")
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(.horizontal, 16)
 
                     // Optional hours
@@ -346,7 +353,7 @@ struct RuleOfLifeFormView: View {
                                         .font(.system(size: 18))
                                     Text(hour)
                                         .font(.system(size: 15))
-                                        .foregroundColor(.black)
+                                        .foregroundColor(.primary)
                                         .multilineTextAlignment(.leading)
                                     Spacer()
                                 }
@@ -359,12 +366,12 @@ struct RuleOfLifeFormView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("(Other Commitments for Prayer):")
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $prayerNotes1)
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(8)
                         .frame(height: 80)
                         .background(Color.white.opacity(0.9))
@@ -380,14 +387,14 @@ struct RuleOfLifeFormView: View {
             Text("Sacraments")
                 .font(.system(size: 18))
                 .fontWeight(.bold)
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
                 .padding(.leading, 16)
             
             VStack(alignment: .leading, spacing: 15) {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I will attend Mass on these days:")
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(.horizontal, 16)
                     
                     HStack {
@@ -399,14 +406,14 @@ struct RuleOfLifeFormView: View {
                             }) {
                                 Text(["S", "M", "T", "W", "Th", "F", "S"][index])
                                     .font(.system(size: 16))
-                                    .foregroundColor(selectedMassDays[index] ? .white : .black)
+                                    .foregroundColor(selectedMassDays[index] ? .white : Color.primary)
                                     .padding(.vertical, 5)
                                     .padding(.horizontal, 10)
-                                    .background(selectedMassDays[index] ? Color.blue : Color.white)
+                                    .background(selectedMassDays[index] ? Color.blue : Color(.systemGray6))
                                     .cornerRadius(8)
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 8)
-                                            .stroke(Color.black, lineWidth: 1)
+                                            .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
                                     )
                             }
                         }
@@ -418,12 +425,14 @@ struct RuleOfLifeFormView: View {
                 HStack {
                     Text("I will go to Confession")
                         .font(.system(size: 16))
+                        .foregroundColor(.primary)
                     TextField("2", text: $confessionTimesPerMonth)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .frame(width: 50)
                         .keyboardType(.numberPad)
                     Text("times a month")
                         .font(.system(size: 16))
+                        .foregroundColor(.primary)
                 }
                 .padding(.horizontal, 16)
             }
@@ -435,19 +444,19 @@ struct RuleOfLifeFormView: View {
             Text("Virtue")
                 .font(.system(size: 18))
                 .fontWeight(.bold)
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
                 .padding(.leading, 16)
             
             VStack(alignment: .leading, spacing: 15) {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I will engage in this digital fast:")
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $digitalFast)
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(8)
                         .frame(height: 80)
                         .background(Color.white.opacity(0.9))
@@ -458,12 +467,12 @@ struct RuleOfLifeFormView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I will engage in this bodily fast:")
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $bodilyFast)
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(8)
                         .frame(height: 80)
                         .background(Color.white.opacity(0.9))
@@ -474,12 +483,12 @@ struct RuleOfLifeFormView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I will fulfill (if any) practices from hismercyendures.org:")
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $chastityPractices)
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(8)
                         .frame(height: 80)
                         .background(Color.white.opacity(0.9))
@@ -490,12 +499,12 @@ struct RuleOfLifeFormView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("(Other commitments for Virtue):")
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(.horizontal, 16)
 
                     TextEditor(text: $virtueNotes1)
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(8)
                         .frame(height: 80)
                         .background(Color.white.opacity(0.9))
@@ -511,19 +520,19 @@ struct RuleOfLifeFormView: View {
             Text("Service")
                 .font(.system(size: 18))
                 .fontWeight(.bold)
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
                 .padding(.leading, 16)
             
             VStack(alignment: .leading, spacing: 15) {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I will be an altar server at this parish:")
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $altarServerParish)
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(8)
                         .frame(height: 60)
                         .background(Color.white.opacity(0.9))
@@ -534,12 +543,12 @@ struct RuleOfLifeFormView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I will do this spiritual work of mercy:")
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $spiritualWorkOfMercy)
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(8)
                         .frame(height: 80)
                         .background(Color.white.opacity(0.9))
@@ -550,12 +559,12 @@ struct RuleOfLifeFormView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I will do this corporal work of mercy:")
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $corporalWorkOfMercy)
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(8)
                         .frame(height: 80)
                         .background(Color.white.opacity(0.9))
@@ -566,12 +575,12 @@ struct RuleOfLifeFormView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("(Other commitments for Service):")
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(.horizontal, 16)
 
                     TextEditor(text: $serviceNotes1)
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(8)
                         .frame(height: 80)
                         .background(Color.white.opacity(0.9))
@@ -587,7 +596,7 @@ struct RuleOfLifeFormView: View {
             Text("Study")
                 .font(.system(size: 18))
                 .fontWeight(.bold)
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
                 .padding(.leading, 16)
             
             VStack(alignment: .leading, spacing: 15) {
@@ -612,12 +621,12 @@ struct RuleOfLifeFormView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("(Other commitments for Study):")
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(.horizontal, 16)
 
                     TextEditor(text: $studyNotes1)
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(8)
                         .frame(height: 80)
                         .background(Color.white.opacity(0.9))
@@ -633,7 +642,7 @@ struct RuleOfLifeFormView: View {
             Text("Specific Discernment Actions")
                 .font(.system(size: 20))
                 .fontWeight(.bold)
-                .foregroundColor(.black)
+                .foregroundColor(.primary)
                 .padding(.leading, 16)
                 .padding(.top, 10)
             
@@ -642,28 +651,51 @@ struct RuleOfLifeFormView: View {
                 Text("Dating Fast")
                     .font(.system(size: 18))
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                     .padding(.leading, 16)
                 
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("✓ I will relate to women in the way that a priest relates to women (or, in the way a married man relates to women who are not his wife) for 180 days")
-                        .font(.system(size: 16))
-                        .foregroundColor(.blue)
-                        .padding(.horizontal, 16)
-                    
-                    Text("✓ I will dismiss any romantic interests that arise for 180 days")
-                        .font(.system(size: 16))
-                        .foregroundColor(.blue)
-                        .padding(.horizontal, 16)
-                    
-                    Text("✓ I will avoid one-on-one settings with women for 180 days")
-                        .font(.system(size: 16))
-                        .foregroundColor(.blue)
-                        .padding(.horizontal, 16)
-                    Text("(This does not require avoiding those one-on-one settings required by work or school.)")
-                        .font(.system(size: 16))
-                        .foregroundColor(.blue)
-                        .padding(.horizontal, 16)
+                    // First checkbox item
+                    HStack {
+                        Image(systemName: "checkmark.square.fill")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                        Text("I will relate to women in the way that a priest relates to women (or, in the way a married man relates to women who are not his wife) for 180 days")
+                            .font(.system(size: 16))
+                            .foregroundColor(.primary)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 16)
+
+                    // Second checkbox item
+                    HStack {
+                        Image(systemName: "checkmark.square.fill")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                        Text("I will dismiss any romantic interests that arise for 180 days")
+                            .font(.system(size: 16))
+                            .foregroundColor(.primary)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 16)
+
+                    // Third checkbox item with note
+                    HStack {
+                        Image(systemName: "checkmark.square.fill")
+                            .foregroundColor(.blue)
+                            .font(.system(size: 18))
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("I will avoid one-on-one settings with women for 180 days")
+                                .font(.system(size: 16))
+                                .foregroundColor(.primary)
+                            Text("(This does not require avoiding those one-on-one settings required by work or school.)")
+                                .font(.system(size: 14))
+                                .foregroundColor(.secondary)
+                                .italic()
+                        }
+                        Spacer()
+                    }
+                    .padding(.horizontal, 16)
                 }
             }
             
@@ -672,23 +704,29 @@ struct RuleOfLifeFormView: View {
                 Text("Spiritual Direction")
                     .font(.system(size: 18))
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                     .padding(.leading, 16)
                 
-                Text("✓ I will go to spiritual direction once a month")
-                    .font(.system(size: 16))
-                    .foregroundColor(.blue)
-                    .padding(.horizontal, 16)
+                HStack {
+                    Image(systemName: "checkmark.square.fill")
+                        .foregroundColor(.blue)
+                        .font(.system(size: 18))
+                    Text("I will go to spiritual direction once a month")
+                        .font(.system(size: 16))
+                        .foregroundColor(.primary)
+                    Spacer()
+                }
+                .padding(.horizontal, 16)
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("My spiritual director is:")
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $spiritualDirectorName)
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(8)
                         .frame(height: 60)
                         .background(Color.white.opacity(0.9))
@@ -702,7 +740,7 @@ struct RuleOfLifeFormView: View {
                 Text("Visit a Seminary")
                     .font(.system(size: 18))
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                     .padding(.leading, 16)
                 
                 HStack {
@@ -732,18 +770,18 @@ struct RuleOfLifeFormView: View {
                 Text("Discernment Retreat")
                     .font(.system(size: 18))
                     .fontWeight(.bold)
-                    .foregroundColor(.black)
+                    .foregroundColor(.primary)
                     .padding(.leading, 16)
                 
                 VStack(alignment: .leading, spacing: 10) {
                     Text("I will go on this retreat:")
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $retreatName)
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(8)
                         .frame(height: 60)
                         .background(Color.white.opacity(0.9))
@@ -754,12 +792,12 @@ struct RuleOfLifeFormView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("It takes place on this date:")
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(.horizontal, 16)
                     
                     TextEditor(text: $retreatDate)
                         .font(.system(size: 16))
-                        .foregroundColor(.black)
+                        .foregroundColor(.primary)
                         .padding(8)
                         .frame(height: 60)
                         .background(Color.white.opacity(0.9))
