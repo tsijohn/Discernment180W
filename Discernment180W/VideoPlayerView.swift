@@ -28,11 +28,13 @@ struct VideoPlayerView: View {
                     .font(.largeTitle)
                     .fontWeight(.bold)
                     .foregroundColor(.white)
-                    .padding(.top, 40)
+                    .padding(.top, 25)
 
                 if let videoURL = videoURL {
                     AVPlayerView(url: videoURL, subtitleURL: subtitleURL, isPlaying: $isVideoPlaying)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .scaleEffect(1.10)
+                        .clipped()
                 } else {
                     // Show error message if video file not found
                     VStack {
@@ -89,7 +91,7 @@ struct VideoPlayerView: View {
                     }
                     .padding(.horizontal, 20)
                     .frame(height: 50)
-                    
+
                     if !authViewModel.isAuthenticated {
                         Button(action: {
                             isVideoPlaying = false

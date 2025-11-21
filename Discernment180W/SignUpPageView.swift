@@ -16,6 +16,8 @@ struct SignUpPageView: View {
     @State private var diocese: String = ""
     @State private var showAlert = false
     @State private var alertMessage = ""
+    @State private var alertTitle = "Sign Up"
+    @State private var isSuccessAlert = false
     @State private var navigateToHome = false
     @State private var isProcessing = false
 
@@ -98,7 +100,16 @@ struct SignUpPageView: View {
                     .opacity((isProcessing || !isFormValid) ? 0.6 : 1.0)
                     
                     .alert(isPresented: $showAlert) {
-                        Alert(title: Text("Sign Up"), message: Text(alertMessage), dismissButton: .default(Text("OK")))
+                        Alert(
+                            title: Text(alertTitle),
+                            message: Text(alertMessage),
+                            dismissButton: .default(Text("OK")) {
+                                if isSuccessAlert {
+                                    navigateToHome = true
+                                    isSuccessAlert = false
+                                }
+                            }
+                        )
                     }
 
                     Spacer()
@@ -134,6 +145,8 @@ struct SignUpPageView: View {
     private func handleSignUp() {
         // Validate form
         guard isFormValid else {
+            alertTitle = "Sign Up Error"
+            isSuccessAlert = false
             if password != confirmPassword {
                 alertMessage = "Passwords do not match"
             } else if password.count < 6 {
@@ -176,9 +189,14 @@ struct SignUpPageView: View {
                     await MainActor.run {
                         isProcessing = false
                         if authViewModel.isAuthenticated {
-                            navigateToHome = true
+                            alertTitle = "Welcome!"
+                            alertMessage = "Your account has been successfully created. Welcome to Discernment 180!"
+                            isSuccessAlert = true
+                            showAlert = true
                         } else {
+                            alertTitle = "Sign Up"
                             alertMessage = "Account created! Please log in with your credentials."
+                            isSuccessAlert = false
                             showAlert = true
                         }
                     }
@@ -186,7 +204,9 @@ struct SignUpPageView: View {
             case .failure(let error):
                 DispatchQueue.main.async {
                     isProcessing = false
+                    alertTitle = "Sign Up Error"
                     alertMessage = "Error signing up: \(error.localizedDescription)"
+                    isSuccessAlert = false
                     showAlert = true
                 }
             }

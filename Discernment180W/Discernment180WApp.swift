@@ -41,6 +41,7 @@ struct Discernment180WApp: App {
                 .environmentObject(appState)
                 .environmentObject(authViewModel)
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .preferredColorScheme(.light) // Force light mode for the entire app
         }
     }
 }

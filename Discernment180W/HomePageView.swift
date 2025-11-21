@@ -565,9 +565,9 @@ struct HomePageView: View {
                                                 .foregroundColor(Color(hexString: "#DAA520"))
                                                 .padding(.bottom, 5)
 
-                                            Text(excerptText)
+                                            // Display HTML content as attributed string
+                                            HTMLFormattedText(excerptText)
                                                 .font(.system(size: 18))
-                                                .fontWeight(.regular)
                                                 .foregroundColor(Color(hexString: "#132A47").opacity(0.9))
                                                 .multilineTextAlignment(.center)
                                                 .padding(.horizontal, 20)
@@ -711,6 +711,82 @@ func getCurrentWeekNumber(from currentDayText: String) -> Int {
     
     let weekNumber = ((currentDay - 1) / 7) + 1
     return weekNumber
+}
+
+// Helper view to display HTML formatted text
+struct HTMLFormattedText: View {
+    let htmlString: String
+    @State private var attributedString = AttributedString()
+
+    init(_ htmlString: String) {
+        self.htmlString = htmlString
+    }
+
+    var body: some View {
+        Text(attributedString)
+            .onAppear {
+                loadHTML()
+            }
+            .onChange(of: htmlString) { _ in
+                loadHTML()
+            }
+    }
+
+    private func loadHTML() {
+        // First try to parse as HTML
+        if let data = htmlString.data(using: .utf8) {
+            let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
+                .documentType: NSAttributedString.DocumentType.html,
+                .characterEncoding: String.Encoding.utf8.rawValue
+            ]
+
+            do {
+                let nsAttributedString = try NSAttributedString(
+                    data: data,
+                    options: options,
+                    documentAttributes: nil
+                )
+
+                // Convert to SwiftUI AttributedString
+                if let converted = try? AttributedString(nsAttributedString) {
+                    self.attributedString = converted
+                } else {
+                    // Fallback to plain text
+                    self.attributedString = AttributedString(htmlString)
+                }
+            } catch {
+                // If HTML parsing fails, strip HTML tags and display as plain text
+                let plainText = htmlString.stripHTMLTags()
+                self.attributedString = AttributedString(plainText)
+            }
+        } else {
+            // Fallback to plain text
+            self.attributedString = AttributedString(htmlString)
+        }
+    }
+}
+
+// Extension to strip HTML tags
+extension String {
+    func stripHTMLTags() -> String {
+        // Simple regex to remove HTML tags
+        let pattern = "<[^>]+>"
+        let stripped = self.replacingOccurrences(of: pattern, with: "", options: .regularExpression, range: nil)
+        // Replace common HTML entities
+        return stripped
+            .replacingOccurrences(of: "&nbsp;", with: " ")
+            .replacingOccurrences(of: "&amp;", with: "&")
+            .replacingOccurrences(of: "&lt;", with: "<")
+            .replacingOccurrences(of: "&gt;", with: ">")
+            .replacingOccurrences(of: "&quot;", with: "\"")
+            .replacingOccurrences(of: "&#39;", with: "'")
+            .replacingOccurrences(of: "&rsquo;", with: "'")
+            .replacingOccurrences(of: "&lsquo;", with: "'")
+            .replacingOccurrences(of: "&rdquo;", with: "\u{201D}")
+            .replacingOccurrences(of: "&ldquo;", with: "\u{201C}")
+            .replacingOccurrences(of: "&mdash;", with: "\u{2014}")
+            .replacingOccurrences(of: "&ndash;", with: "\u{2013}")
+    }
 }
 
 struct HomePageView_Previews: PreviewProvider {

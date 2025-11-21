@@ -216,33 +216,60 @@ struct WeekReviewView: View {
                 
                 // My Rule Section (moved above) - Always visible now
                 Button(action: {
-                    withAnimation {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                         showingMyRule.toggle()
                     }
                 }) {
-                    HStack {
-                        Text("My Rule")
-                            .font(.system(size: 15))
-                            .fontWeight(.medium)
-                            .foregroundColor(.black)
-                            .lineLimit(1)
-                        
-                        Spacer()
-                        
-                        Image(systemName: showingMyRule ? "chevron.up" : "chevron.down")
-                            .font(.system(size: 13, weight: .medium))
+                    HStack(spacing: 12) {
+                        // Icon to indicate expandable content
+                        Image(systemName: showingMyRule ? "doc.text.fill" : "doc.text")
+                            .font(.system(size: 16))
                             .foregroundColor(.blue)
+
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("My Rule")
+                                .font(.system(size: 16))
+                                .fontWeight(.semibold)
+                                .foregroundColor(.black)
+                                .lineLimit(1)
+
+                            Text(showingMyRule ? "Tap to collapse" : "Tap to view your commitments")
+                                .font(.system(size: 12))
+                                .foregroundColor(.gray)
+                        }
+
+                        Spacer()
+
+                        // Animated expand/collapse indicator
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 6)
+                                .fill(showingMyRule ? Color.blue.opacity(0.1) : Color.gray.opacity(0.1))
+                                .frame(width: 32, height: 32)
+
+                            Image(systemName: showingMyRule ? "minus" : "plus")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(showingMyRule ? .blue : .gray)
+                                .rotationEffect(.degrees(showingMyRule ? 0 : 0))
+                                .animation(.easeInOut(duration: 0.2), value: showingMyRule)
+                        }
                     }
                     .padding(.horizontal, 14)
-                    .padding(.vertical, 10)
+                    .padding(.vertical, 12)
                     .background(
-                        RoundedRectangle(cornerRadius: 10)
-                            .fill(Color(.systemBackground))
-                            .shadow(color: Color.black.opacity(0.05), radius: 2, x: 0, y: 1)
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(showingMyRule ? Color.blue.opacity(0.05) : Color(.systemBackground))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(showingMyRule ? Color.blue.opacity(0.3) : Color.gray.opacity(0.2), lineWidth: 1)
+                            )
+                            .shadow(color: showingMyRule ? Color.blue.opacity(0.1) : Color.black.opacity(0.05),
+                                   radius: showingMyRule ? 4 : 2,
+                                   x: 0,
+                                   y: showingMyRule ? 2 : 1)
                     )
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, showingMyRule ? 60 : 0) // Add top padding only when expanded
+                .padding(.top, showingMyRule ? 70 : 0) // Add top padding only when expanded
                 
                 // My Rule content (shown when expanded) - EXTENDS TO 80% OF PAGE
                 if showingMyRule && focusedField == nil {
@@ -692,7 +719,6 @@ struct WeekReviewView: View {
         }
         .navigationBarHidden(true)
         .ignoresSafeArea(.keyboard, edges: .bottom)
-        .preferredColorScheme(.light) // Force light mode for this entire view
         .onAppear {
             selectedWeek = weekNumber
             Task {
